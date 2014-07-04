@@ -160,6 +160,9 @@ int hook_privmsg(char *word[], char *word_eol[], void *userdata)
 		.address = (char*)server };
 	xchat_context *query_ctx;
 
+    char *chanmsg = word[3];
+    if ((*chanmsg == '&')||(*chanmsg == '#'))
+        return XCHAT_EAT_NONE;
 	if (!extract_nick(nick,word[1]))
 		return XCHAT_EAT_NONE;
 
@@ -179,6 +182,24 @@ int hook_privmsg(char *word[], char *word_eol[], void *userdata)
 	}
 
 	query_ctx = xchat_find_context(ph, server, nick);
+
+#ifdef HAVE_GREGEX_H
+    GRegex *regex_quot  = g_regex_new("&quot;",0,0,NULL);
+    GRegex *regex_amp   = g_regex_new("&amp;",0,0,NULL);
+    GRegex *regex_lt    = g_regex_new("&lt;",0,0,NULL);
+    GRegex *regex_gt    = g_regex_new("&gt;",0,0,NULL);
+    char *quotfix = g_regex_replace_literal(regex_quot,newmsg,-1,0,"\"",0,NULL);
+    char *ampfix  = g_regex_replace_literal(regex_amp,quotfix,-1,0,"&",0,NULL);
+    char *ltfix   = g_regex_replace_literal(regex_lt,ampfix,-1,0,"<",0,NULL);
+    char *gtfix   = g_regex_replace_literal(regex_gt,ltfix,-1,0,">",0,NULL);
+    newmsg = gtfix;
+
+    g_regex_unref(regex_quot);
+    g_regex_unref(regex_amp);
+    g_regex_unref(regex_lt);
+    g_regex_unref(regex_gt);
+#endif
+
 
 	if (query_ctx)
 		xchat_set_context(ph, query_ctx);

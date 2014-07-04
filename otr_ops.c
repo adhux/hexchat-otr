@@ -236,7 +236,7 @@ void ops_still_secure(void *opdata, ConnContext *context, int is_reply)
  */
 void ops_log(void *opdata, const char *message)
 {
-	otr_infost(TXT_OPS_LOG,message);
+//	otr_infost(TXT_OPS_LOG,message);
 }
 
 /*
