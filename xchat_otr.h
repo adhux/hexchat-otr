@@ -1,7 +1,7 @@
-#include "xchat-plugin.h"
+#include "hexchat-plugin.h"
 
-#define PNAME "xchat-otr"
-#define PDESC "Off-The-Record Messaging for xchat"
+#define PNAME "Hexchat OTR"
+#define PDESC "Off-The-Record Messaging for hexchat"
 #define PVERSION IRSSIOTR_VERSION
 
 #define MAX_FORMAT_PARAMS 10
@@ -13,6 +13,7 @@ struct _IRC_CTX {
 };
 
 typedef struct _IRC_CTX IRC_CTX;
+
 struct _FORMAT_REC {
 	char *tag;
 	char *def;
@@ -25,10 +26,10 @@ typedef struct _FORMAT_REC FORMAT_REC;
 
 enum { MSGLEVEL_CRAP, MSGLEVEL_MSGS } lvls;
 
-extern xchat_plugin *ph;   /* plugin handle */
+extern hexchat_plugin *ph;   /* plugin handle */
 
 #define statusbar_items_redraw(name) ;
-#define get_irssi_dir() xchat_get_info(ph,"xchatdir")
+#define get_irssi_dir() hexchat_get_info(ph,"configdir")
 
 void printformat(IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...);
 
