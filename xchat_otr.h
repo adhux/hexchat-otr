@@ -1,7 +1,7 @@
 #include "hexchat-plugin.h"
 
 #define PNAME "Hexchat OTR"
-#define PDESC "Off-The-Record Messaging for hexchat"
+#define PDESC "Off-The-Record Messaging for Hexchat"
 #define PVERSION IRSSIOTR_VERSION
 
 #define MAX_FORMAT_PARAMS 10

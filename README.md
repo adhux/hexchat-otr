@@ -6,15 +6,17 @@ Ubuntu 14.04. You can download it from here
 
     https://otr.cypherpunks.ca/libotr-3.2.1.tar.gz
 
+If the link above doesn't work, you can clone it from my archive
+
+    git clone https://github.com/adhux/libotr-3.2.1.git
+
 and install it with the following commands
 
     sudo apt-get install libgcrypt11-dev
-    tar xvfz libotr-3.2.1.tar.gz
     cd libotr-3.2.1
     ./configure
     make
     sudo make install
-
 
 Then install hexchat-otr with these commands
 
