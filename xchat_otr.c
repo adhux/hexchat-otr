@@ -182,6 +182,10 @@ int hook_privmsg(char *word[], char *word_eol[], void *userdata)
 	}
 
 	query_ctx = hexchat_find_context(ph, server, nick);
+	if(query_ctx==NULL) {
+		hexchat_commandf(ph, "query %s", nick);
+		query_ctx = hexchat_find_context(ph, server, nick);
+	}
 
 #ifdef HAVE_GREGEX_H
     GRegex *regex_quot  = g_regex_new("&quot;",0,0,NULL);
