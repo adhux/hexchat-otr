@@ -22,9 +22,6 @@ struct _FORMAT_REC
 {
 	char *tag;
 	char *def;
-
-	int params;
-	int paramtypes[MAX_FORMAT_PARAMS];
 };
 
 typedef struct _FORMAT_REC FORMAT_REC;

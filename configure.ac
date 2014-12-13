@@ -40,7 +40,7 @@ AC_SUBST([hexchatlibdir])
 CFLAGS="$CFLAGS"
 # TODO: Improve
 if test "$CC" = "gcc" || test "$CC" = "clang"; then
-	CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers"
+	CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter"
 fi
 AC_SUBST([CFLAGS])
 
