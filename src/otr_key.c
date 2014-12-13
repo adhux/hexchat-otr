@@ -110,7 +110,6 @@ gboolean keygen_complete (GIOChannel *source, GIOCondition condition,
 					  kg_st.accountname,
 					  time (NULL) - kg_st.started);
 		rename (tmpfilename, filename);
-		//otrl_privkey_forget_all(otr_state); <-- done by lib
 		key_load ();
 	}
 
@@ -206,7 +205,6 @@ void keygen_run (const char *accname)
 	err = otrl_privkey_generate (otr_state, filename, accname, PROTOCOLID);
 	write (fds[1], &err, sizeof(err));
 
-	//g_free(filename);
 	_exit (0);
 }
 

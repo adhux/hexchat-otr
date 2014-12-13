@@ -154,7 +154,7 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 		}
 		else if (strcmp (word[3], "finishonunload") == 0)
 		{
-			set_finishonunload = (strcasecmp (word[4], "true") == 0);
+			set_finishonunload = (g_ascii_strcasecmp (word[4], "true") == 0);
 		}
 		else
 		{
@@ -198,7 +198,7 @@ int hook_outgoing (char *word[], char *word_eol[], void *userdata)
 	if (!otrmsg)
 		return HEXCHAT_EAT_ALL;
 
-	snprintf (newmsg, 511, "PRIVMSG %s :%s", channel, otrmsg);
+	g_snprintf (newmsg, 511, "PRIVMSG %s :%s", channel, otrmsg);
 
 	otrl_message_free (otrmsg);
 	hexchat_command (ph, newmsg);
@@ -337,7 +337,7 @@ void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)
 		find_query_ctx = hexchat_find_context (ph, server, nick);
 		if (find_query_ctx == NULL)
 		{
-			// no query window yet, let's open one
+			/* no query window yet, let's open one */
 			hexchat_commandf (ph, "query %s", nick);
 			find_query_ctx = hexchat_find_context (ph, server, nick);
 		}
@@ -353,7 +353,7 @@ void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)
 
 	hexchat_set_context (ph, find_query_ctx);
 
-	if (vsnprintf (msg, sizeof(msg), formats[fnum].def, params) < 0)
+	if (g_vsnprintf (msg, sizeof(msg), formats[fnum].def, params) < 0)
 		g_snprintf (msg, sizeof(msg), "internal error parsing error string (BUG)");
 	va_end (params);
 	hexchat_printf (ph, "OTR: %s", s);
