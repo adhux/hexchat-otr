@@ -42,14 +42,14 @@
 
 #define LOGMAX 1024
 
-#define LVL_NOTICE  0
-#define LVL_DEBUG   1
+#define LVL_NOTICE 0
+#define LVL_DEBUG 1
 
-#define otr_logst(level,format,...) \
-	otr_log(NULL,NULL,level,format, ## __VA_ARGS__)
+#define otr_logst(level, format, ...) \
+	otr_log (NULL, NULL, level, format, ##__VA_ARGS__)
 
-void otr_log(IRC_CTX *server, const char *to, 
-	     int level, const char *format, ...);
+void otr_log (IRC_CTX *server, const char *to,
+			  int level, const char *format, ...);
 
 /* own */
 
@@ -66,9 +66,9 @@ void otr_log(IRC_CTX *server, const char *to,
 /* otr protocol id */
 #define PROTOCOLID "IRC"
 
-#define KEYFILE    "/otr/otr.key"
+#define KEYFILE "/otr/otr.key"
 #define TMPKEYFILE "/otr/otr.key.tmp"
-#define FPSFILE    "/otr/otr.fp"
+#define FPSFILE "/otr/otr.fp"
 
 /* some defaults */
 #define IO_DEFAULT_POLICY "*@localhost opportunistic,*bitlbee* opportunistic,*@im.* opportunistic, *serv@irc* never"
@@ -76,37 +76,52 @@ void otr_log(IRC_CTX *server, const char *to,
 #define IO_DEFAULT_IGNORE "xmlconsole[0-9]*"
 
 /* one for each OTR context (=communication pair) */
-struct co_info {
-	char *msgqueue;			/* holds partially reconstructed base64
+struct co_info
+{
+	char *msgqueue; /* holds partially reconstructed base64
 					   messages */
-	IRC_CTX *ircctx;		/* irssi server object for this peer */
-	int received_smp_init;		/* received SMP init msg */
-	int smp_failed;			/* last SMP failed */
-	char better_msg_two[256];	/* what the second line of the "better"
+	IRC_CTX *ircctx; /* irssi server object for this peer */
+	int received_smp_init; /* received SMP init msg */
+	int smp_failed; /* last SMP failed */
+	char better_msg_two[256]; /* what the second line of the "better"
 					   default query msg should like. Eat it
 					   up when it comes in */
-	int finished;			/* true after you've /otr finished */
+	int finished; /* true after you've /otr finished */
 };
 
 /* these are returned by /otr contexts */
 
-struct fplist_ {
+struct fplist_
+{
 	char *fp;
-	enum { NOAUTH,AUTHSMP,AUTHMAN } authby;
+	enum
+	{
+		NOAUTH,
+		AUTHSMP,
+		AUTHMAN
+	} authby;
 	struct fplist_ *next;
 };
 
-struct ctxlist_ {
+struct ctxlist_
+{
 	char *username;
 	char *accountname;
-	enum { STUNENCRYPTED,STENCRYPTED,STFINISHED,STUNKNOWN } state;
+	enum
+	{
+		STUNENCRYPTED,
+		STENCRYPTED,
+		STFINISHED,
+		STUNKNOWN
+	} state;
 	struct fplist_ *fplist;
 	struct ctxlist_ *next;
 };
 
 /* policy list generated from /set otr_policy */
 
-struct plistentry {
+struct plistentry
+{
 	GPatternSpec *namepat;
 	OtrlPolicy policy;
 };
@@ -114,38 +129,36 @@ struct plistentry {
 /* used by the logging functions below */
 extern int debug;
 
-void irc_send_message(IRC_CTX *ircctx, const char *recipient, char *msg);
-IRC_CTX *server_find_address(char *address);
+void irc_send_message (IRC_CTX *ircctx, const char *recipient, char *msg);
+IRC_CTX *server_find_address (char *address);
 
 /* init stuff */
 
-int otrlib_init();
-void otrlib_deinit();
-void otr_initops();
-void otr_setpolicies(const char *policies, int known);
+int otrlib_init ();
+void otrlib_deinit ();
+void otr_initops ();
+void otr_setpolicies (const char *policies, int known);
 
 /* basic send/receive/status stuff */
 
-char *otr_send(IRC_CTX *server,const char *msg,const char *to);
-char *otr_receive(IRC_CTX *server,const char *msg,const char *from);
-int otr_getstatus(char *mynick, char *nick, char *server);
-ConnContext *otr_getcontext(const char *accname,const char *nick,int create,void *data);
+char *otr_send (IRC_CTX *server, const char *msg, const char *to);
+char *otr_receive (IRC_CTX *server, const char *msg, const char *from);
+int otr_getstatus (char *mynick, char *nick, char *server);
+ConnContext *otr_getcontext (const char *accname, const char *nick, int create, void *data);
 
 /* user interaction */
 
-void otr_trust(IRC_CTX *server, char *nick, const char *peername);
-void otr_finish(IRC_CTX *server, char *nick, const char *peername, int inquery);
-void otr_auth(IRC_CTX *server, char *nick, const char *peername, const char *secret);
-void otr_authabort(IRC_CTX *server, char *nick, const char *peername);
-struct ctxlist_ *otr_contexts();
-void otr_finishall();
-
+void otr_trust (IRC_CTX *server, char *nick, const char *peername);
+void otr_finish (IRC_CTX *server, char *nick, const char *peername, int inquery);
+void otr_auth (IRC_CTX *server, char *nick, const char *peername, const char *secret);
+void otr_authabort (IRC_CTX *server, char *nick, const char *peername);
+struct ctxlist_ *otr_contexts ();
+void otr_finishall ();
 
 /* key/fingerprint stuff */
 
-void keygen_run(const char *accname);
-void keygen_abort();
-void key_load();
-void fps_load();
-void otr_writefps();
-
+void keygen_run (const char *accname);
+void keygen_abort ();
+void key_load ();
+void fps_load ();
+void otr_writefps ();
