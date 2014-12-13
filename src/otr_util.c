@@ -26,10 +26,7 @@ extern OtrlMessageAppOps otr_ops;
 static int otrinited = FALSE;
 GSList *plistunknown = NULL;
 GSList *plistknown = NULL;
-
-#ifdef HAVE_GREGEX_H
-GRegex *regex_policies;
-#endif
+GRegex *regex_policies = NULL;
 
 /*
  * init otr lib.
@@ -51,11 +48,9 @@ int otrlib_init()
 
 	otr_initops();
 
-#ifdef HAVE_GREGEX_H
 	regex_policies = 
 		g_regex_new("([^,]+) (never|manual|handlews|opportunistic|always)"
 			    "(,|$)",0,0,NULL);
-#endif
 
 	return otr_state==NULL;
 }
@@ -76,10 +71,7 @@ void otrlib_deinit()
 	otr_setpolicies("",FALSE);
 	otr_setpolicies("",TRUE);
 
-#ifdef HAVE_GREGEX_H
 	g_regex_unref(regex_policies);
-#endif
-
 }
 
 
@@ -728,7 +720,6 @@ char *otr_receive(IRC_CTX *ircctx, const char *msg,const char *from)
 
 void otr_setpolicies(const char *policies, int known)
 {
-#ifdef HAVE_GREGEX_H
 	GMatchInfo *match_info;
 	GSList *plist = known ? plistknown : plistunknown;
 

@@ -2,10 +2,7 @@
 
 int debug = 0;
 
-#ifdef HAVE_GREGEX_H
 GRegex *regex_nickignore = NULL;
-#endif
-
 hexchat_plugin *ph;
 
 static char set_policy[512] = IO_DEFAULT_POLICY;
@@ -49,7 +46,7 @@ int cmd_otr(char *word[], char *word_eol[], void *userdata)
 		debug = !debug;
 		otr_noticest(debug ? TXT_CMD_DEBUG_ON : TXT_CMD_DEBUG_OFF);
 	} else if (strcmp(cmd,"version")==0) {
-		otr_noticest(TXT_CMD_VERSION,IRSSIOTR_VERSION);
+		otr_noticest(TXT_CMD_VERSION,PVERSION);
 	} else if (strcmp(cmd,"finish")==0) {
 		if (word[3]&&*word[3])
 			otr_finish(NULL,NULL,word[3],TRUE);
@@ -92,12 +89,10 @@ int cmd_otr(char *word[], char *word_eol[], void *userdata)
 			otr_setpolicies(word_eol[4],TRUE);
 			strcpy(set_policy_known,word_eol[4]);
 		} else if (strcmp(word[3],"ignore")==0) {
-#ifdef HAVE_GREGEX_H
 			if (regex_nickignore)
 				g_regex_unref(regex_nickignore);
 			regex_nickignore = g_regex_new(word_eol[4],0,0,NULL);
 			strcpy(set_ignore,word_eol[4]);
-#endif
 		} else if (strcmp(word[3],"finishonunload")==0) {
 			set_finishonunload = (strcasecmp(word[4],"true")==0);
 		} else {
@@ -127,10 +122,8 @@ int hook_outgoing(char *word[], char *word_eol[], void *userdata)
 	if ((*channel == '&')||(*channel == '#'))
 		return HEXCHAT_EAT_NONE;
 
-#ifdef HAVE_GREGEX_H
 	if (g_regex_match(regex_nickignore,channel,0,NULL))
 		return HEXCHAT_EAT_NONE;
-#endif
 	otrmsg = otr_send(&ircctx,word_eol[1],channel);
 
 	if (otrmsg==word_eol[1])
@@ -166,10 +159,8 @@ int hook_privmsg(char *word[], char *word_eol[], void *userdata)
 	if (!extract_nick(nick,word[1]))
 		return HEXCHAT_EAT_NONE;
 
-#ifdef HAVE_GREGEX_H
 	if (g_regex_match(regex_nickignore,nick,0,NULL))
 		return HEXCHAT_EAT_NONE;
-#endif
 
 	newmsg = otr_receive(&ircctx,word_eol[2],nick);
 
@@ -187,7 +178,6 @@ int hook_privmsg(char *word[], char *word_eol[], void *userdata)
 		query_ctx = hexchat_find_context(ph, server, nick);
 	}
 
-#ifdef HAVE_GREGEX_H
     GRegex *regex_quot  = g_regex_new("&quot;",0,0,NULL);
     GRegex *regex_amp   = g_regex_new("&amp;",0,0,NULL);
     GRegex *regex_lt    = g_regex_new("&lt;",0,0,NULL);
@@ -202,7 +192,6 @@ int hook_privmsg(char *word[], char *word_eol[], void *userdata)
     g_regex_unref(regex_amp);
     g_regex_unref(regex_lt);
     g_regex_unref(regex_gt);
-#endif
 
 	if (query_ctx)
 		hexchat_set_context(ph, query_ctx);
@@ -244,11 +233,9 @@ int hexchat_plugin_init(hexchat_plugin *plugin_handle,
 	otr_setpolicies(IO_DEFAULT_POLICY,FALSE);
 	otr_setpolicies(IO_DEFAULT_POLICY_KNOWN,TRUE);
 
-#ifdef HAVE_GREGEX_H
 	if (regex_nickignore)
 		g_regex_unref(regex_nickignore);
 	regex_nickignore = g_regex_new(IO_DEFAULT_IGNORE,0,0,NULL);
-#endif
 
 	hexchat_print(ph, "Hexchat OTR loaded successfully!\n");
 
@@ -257,9 +244,7 @@ int hexchat_plugin_init(hexchat_plugin *plugin_handle,
 
 int hexchat_plugin_deinit()
 {
-#ifdef HAVE_GREGEX_H
 	g_regex_unref(regex_nickignore);
-#endif
 
 	if (set_finishonunload)
 		otr_finishall();

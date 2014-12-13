@@ -34,17 +34,9 @@
 #include <glib/gprintf.h>
 #include <glib/gstdio.h>
 
-/* irssi */
+/* hexchat */
 
-#ifdef TARGET_IRSSI
-#include <irssi_otr.h>
-#endif
-
-/* xchat */
-
-#ifdef TARGET_XCHAT
-#include <xchat_otr.h>
-#endif
+#include <hexchat_otr.h>
 
 /* log stuff */
 
@@ -61,10 +53,7 @@ void otr_log(IRC_CTX *server, const char *to,
 
 /* own */
 
-#include "io-config.h"
-
-/* irssi module name */
-#define MODULE_NAME "otr"
+#include "config.h"
 
 #include "otr-formats.h"
 

@@ -11,7 +11,7 @@ lines = map(lambda x: x.strip(),open(sys.argv[1],"r").readlines())
 
 hdr = open("otr-formats.h","w")
 src = open("otr-formats.c","w")
-srcx = open("xchat-formats.c","w")
+srcx = open("hexchat-formats.c","w")
 
 src.write('#include "otr.h"\n');
 srcx.write('#include "otr.h"\n');

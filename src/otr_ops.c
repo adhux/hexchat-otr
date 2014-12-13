@@ -133,8 +133,6 @@ void ops_notify(void *opdata, OtrlNotifyLevel level, const char *accountname,
 }
 #endif
 
-#ifdef HAVE_GREGEX_H
-
 /* This is kind of messy. */
 const char *convert_otr_msg(const char *msg) 
 {
@@ -152,8 +150,6 @@ const char *convert_otr_msg(const char *msg)
 	return msg;
 }
 
-#endif
-
 void ops_handle_msg(void *opdata, OtrlMessageEvent msg_event,
 			ConnContext *co, const char *msg,
 			gcry_error_t err)
@@ -167,45 +163,10 @@ void ops_handle_msg(void *opdata, OtrlMessageEvent msg_event,
 	} else 
 		otr_notice(server, co->username, TXT_OPS_DISPLAY_BUG);
 
-#ifdef HAVE_GREGEX_H
 	msg = convert_otr_msg(msg);
 	otr_notice(server, co->username, TXT_OPS_DISPLAY, msg);
 	g_free((char*)msg);
-#else
-	otr_notice(server, co->username, TXT_OPS_DISPLAY, msg);
-#endif
 }
-
-#if 0
-/*
- * OTR message. E.g. "following has been transmitted in clear: ...".
- * We're trying to kill the ugly HTML.
- */
-int ops_display_msg(void *opdata, const char *accountname, 
-		    const char *protocol, const char *username, 
-		    const char *msg)
-{
-	ConnContext *co = otr_getcontext(accountname,username,FALSE,opdata);
-	IRC_CTX *server = opdata;
-	struct co_info *coi;
-
-	if (co) {
-		coi = co->app_data;
-		server = coi->ircctx;
-	} else 
-		otr_notice(server,username,TXT_OPS_DISPLAY_BUG);
-
-#ifdef HAVE_GREGEX_H
-	msg = convert_otr_msg(msg);
-	otr_notice(server,username,TXT_OPS_DISPLAY,msg);
-	g_free((char*)msg);
-#else
-	otr_notice(server,username,TXT_OPS_DISPLAY,msg);
-#endif
-
-	return 0;
-}
-#endif
 
 /* 
  * Gone secure.
