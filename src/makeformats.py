@@ -10,33 +10,13 @@ import sys,os,re
 lines = map(lambda x: x.strip(),open(sys.argv[1],"r").readlines())
 
 hdr = open("otr-formats.h","w")
-src = open("otr-formats.c","w")
 srcx = open("hexchat-formats.c","w")
 
-src.write('#include "otr.h"\n');
 srcx.write('#include "otr.h"\n');
+srcx.write('FORMAT_REC formats[] = {\n\t')
+srcx.write('{ MODULE_NAME, "otr" }')
 
-src.write("""char *otr_help = "%s";\n""" % "\\n".join(
-	["%9- OTR help -%9"]+
-	[re.sub('^(/otr.*)$','%_\\1%_',
-		re.sub('^(otr_[a-z_]*)$','%_\\1%_',
-			re.sub('"([^"]*)"','\\"%_\\1%_\\"',
-				x.replace('\n','').replace("\t","        ") 
-				)))
-		for x in open(sys.argv[2],"r").readlines()]
-	+["%9- End of OTR help -%9"]
-	))
-
-src.write('FORMAT_REC formats[] = {\n')
-srcx.write('FORMAT_REC formats[] = {\n')
-
-src.write('{ MODULE_NAME, "otr", 0}\n')
-srcx.write('{ MODULE_NAME, "otr", 0}\n')
-
-hdr.write("extern char *otr_help;\n\n");
-
-hdr.write("enum {\n")
-
+hdr.write("enum\n{\n\t")
 hdr.write("TXT_OTR_MODULE_NAME")
 
 fills = 0
@@ -44,18 +24,16 @@ fills = 0
 section = None
 
 for line in lines:
-	src.write(",\n")
-	srcx.write(",\n")
+	srcx.write(",\n\t")
 
 	e = line.split("\t")
 
 	if len(e)==1:
 		# Section name
 		section = e[0]
-		src.write("""{ NULL, "%s", 0 }\n""" % (e[0]))
-		srcx.write("""{ NULL, "%s", 0 }\n""" % (e[0]))
+		srcx.write("""{ NULL, "%s" }""" % (e[0]))
 
-		hdr.write(",\nTXT_OTR_FILL_%d" % fills)
+		hdr.write(",\n\tTXT_OTR_FILL_%d" % fills)
 		
 		fills += 1
 
@@ -66,7 +44,7 @@ for line in lines:
 	new = ""
 	last=0
 	i=0
-	srcx.write("""{ "%s", "%s", 0""" % (e[0],fo.replace("%%9","").replace("%9","").replace("%g","").replace("%n","")))
+	srcx.write("""{ "%s", "%s" """ % (e[0],fo.replace("%%9","").replace("%9","").replace("%g","").replace("%n","")))
 	for m in re.finditer("(^|[^%])%([0-9]*)[ds]",fo):
 		if m.group()[-1]=='d':
 			params += ['1']
@@ -89,15 +67,9 @@ for line in lines:
 	if e[1][0] != "{" and section!="Nickignore" and section!="Contexts":
 		premsg = "%9OTR%9: "
 
-	src.write("""{ "%s", "%s%s", %s""" % (e[0],premsg,e[1],e[2]))
-
-	if len(params)>0:
-		src.write(", { %s }" % ", ".join(params))
-
-	src.write("}")
 	srcx.write("}")
 
-	hdr.write(",\n")
+	hdr.write(",\n\t")
 
 	hdr.write("TXT_%s" % e[0].upper())
 
@@ -107,16 +79,12 @@ hdr.write("""
 extern FORMAT_REC formats[];
 """)
 
-src.write(""",
-{ NULL, NULL, 0 }
-};
-""")
-
 srcx.write(""",
-{ NULL, NULL, 0 }
+\t{ NULL, NULL }
 };
+
+G_STATIC_ASSERT (G_N_ELEMENTS(formats) - 1 == TXT_ST_UNKNOWN + 1);
 """)
 
 hdr.close()
-src.close()
 srcx.close()
