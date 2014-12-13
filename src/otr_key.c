@@ -21,7 +21,6 @@
 
 #include "otr.h"
 
-#include <libgen.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/poll.h>
@@ -150,7 +149,7 @@ void keygen_run (const char *accname)
 	int ret;
 	int fds[2];
 	char *filename = g_strconcat (get_irssi_dir (), TMPKEYFILE, NULL);
-	char *dir = dirname (g_strdup (filename));
+	char *dir = g_path_get_dirname (filename);
 
 	if (kg_st.status != KEYGEN_NO)
 	{
