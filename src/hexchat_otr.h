@@ -6,6 +6,7 @@
 #define PNAME "OTR"
 #define PDESC "Off-The-Record Messaging for Hexchat"
 #define PVERSION PACKAGE_VERSION
+#define OTR_HELP "OTR <version|finish|trust|auth|authabort|genkey|set>"
 
 #define MAX_FORMAT_PARAMS 10
 

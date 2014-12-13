@@ -43,6 +43,12 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 
 	char *cmd = word[2];
 
+	if (!cmd)
+	{
+		hexchat_command(ph, "help otr");
+		return HEXCHAT_EAT_ALL;
+	}
+
 	if (strcmp (cmd, "debug") == 0)
 	{
 		debug = !debug;
@@ -133,6 +139,8 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 							set_finishonunload ? "true" : "false");
 		}
 	}
+	else
+		hexchat_command(ph, "help otr");
 
 	return HEXCHAT_EAT_ALL;
 }
@@ -262,7 +270,7 @@ int hexchat_plugin_init (hexchat_plugin *plugin_handle,
 
 	hexchat_hook_server (ph, "PRIVMSG", HEXCHAT_PRI_NORM, hook_privmsg, 0);
 	hexchat_hook_command (ph, "", HEXCHAT_PRI_NORM, hook_outgoing, 0, 0);
-	hexchat_hook_command (ph, "otr", HEXCHAT_PRI_NORM, cmd_otr, 0, 0);
+	hexchat_hook_command (ph, "otr", HEXCHAT_PRI_NORM, cmd_otr, OTR_HELP, 0);
 
 	otr_setpolicies (IO_DEFAULT_POLICY, FALSE);
 	otr_setpolicies (IO_DEFAULT_POLICY_KNOWN, TRUE);
