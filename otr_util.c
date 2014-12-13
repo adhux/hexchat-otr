@@ -124,8 +124,9 @@ ConnContext *otr_getcontext(const char *accname,const char *nick,
 		nick,
 		accname,
 		PROTOCOLID,
+		OTRL_INSTAG_BEST,
 		create,
-		NULL,
+		FALSE,
 		context_add_app_info,
 		data);
 
@@ -152,16 +153,24 @@ char *otr_send(IRC_CTX *ircctx, const char *msg,const char *to)
 
 	sprintf(accname, "%s@%s", nick, address);
 
+	if (!(co = otr_getcontext(accname,to,FALSE,ircctx))) {
+		otr_notice(ircctx,to,TXT_SEND_CHANGE);
+		return NULL;
+	}
+
 	err = otrl_message_sending(
 		otr_state, 
 		&otr_ops, 
 		ircctx, 
 		accname,
 		PROTOCOLID, 
-		to, 
-		msg, 
-		NULL, 
-		&newmessage, 
+		to,
+		OTRL_INSTAG_BEST,
+		msg,
+		NULL,
+		&newmessage,
+		OTRL_FRAGMENT_SEND_ALL,
+		&co,
 		context_add_app_info, 
 		ircctx);
 
@@ -172,26 +181,6 @@ char *otr_send(IRC_CTX *ircctx, const char *msg,const char *to)
 
 	if (newmessage==NULL)
 		return (char*)msg;
-
-	/* OTR message. Need to do fragmentation */
-
-	if (!(co = otr_getcontext(accname,to,FALSE,ircctx))) {
-		otr_notice(ircctx,to,TXT_SEND_CHANGE);
-		return NULL;
-	}
-
-	err = otrl_message_fragment_and_send(
-		&otr_ops, 
-		ircctx, 
-		co,
-		newmessage, 
-		OTRL_FRAGMENT_SEND_ALL, 
-		NULL);
-
-	if (err != 0) {
-		otr_notice(ircctx,to,TXT_SEND_FRAGMENT,msg);
-	} else
-		otr_debug(ircctx,to,TXT_SEND_CONVERTED,newmessage);
 
 	return NULL;
 }
@@ -255,15 +244,12 @@ int otr_getstatus(char *mynick, char *nick, char *server)
 {
 	ConnContext *co;
 	char accname[128];
-	struct co_info *coi;
 
 	sprintf(accname, "%s@%s", mynick, server);
 
 	if (!(co = otr_getcontext(accname,nick,FALSE,NULL))) {
 		return 0;
 	}
-
-	coi = co->app_data;
 
 	switch (co->msgstate) {
 	case OTRL_MSGSTATE_PLAINTEXT:
@@ -327,7 +313,7 @@ void otr_finish(IRC_CTX *ircctx, char *nick, const char *peername, int inquery)
 	}
 
 	otrl_message_disconnect(otr_state,&otr_ops,ircctx,accname,
-				PROTOCOLID,nick);
+				PROTOCOLID,nick,OTRL_INSTAG_BEST);
 
 	if (inquery) {
 		otr_info(ircctx,nick,TXT_CMD_FINISH,nick,IRCCTX_ADDR(ircctx));
@@ -361,7 +347,8 @@ void otr_finishall()
 		otrl_message_disconnect(otr_state,&otr_ops,coi->ircctx,
 					context->accountname,
 					PROTOCOLID,
-					context->username);
+					context->username,
+					OTRL_INSTAG_BEST);
 
 		otr_infost(TXT_CMD_FINISH,context->username,
 			   IRCCTX_ADDR(coi->ircctx));
@@ -653,7 +640,6 @@ char *otr_receive(IRC_CTX *ircctx, const char *msg,const char *from)
 	int ignore_message;
 	char *newmessage = NULL;
 	char accname[256];
-	char *lastmsg;
 	ConnContext *co;
 	struct co_info *coi;
 	OtrlTLV *tlvs;
@@ -682,8 +668,6 @@ char *otr_receive(IRC_CTX *ircctx, const char *msg,const char *from)
 	 * in the message but it doesn't end with a ".", queue it and wait
 	 * for the rest.
 	 */
-	lastmsg = co->app_data;
-
 	if (coi->msgqueue) { /* already something in the queue */
 		strcpy(coi->msgqueue+strlen(coi->msgqueue),msg);
 
@@ -723,6 +707,7 @@ char *otr_receive(IRC_CTX *ircctx, const char *msg,const char *from)
 		msg, 
 		&newmessage,
 		&tlvs,
+		&co,
 		NULL,
 		NULL);
 

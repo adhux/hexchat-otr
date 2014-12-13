@@ -109,6 +109,8 @@ void ops_inject_msg(void *opdata, const char *accountname,
 	g_free(msgcopy);
 }
 
+
+#if 0
 /*
  * OTR notification. Haven't seen one yet.
  */
@@ -129,6 +131,7 @@ void ops_notify(void *opdata, OtrlNotifyLevel level, const char *accountname,
 	otr_notice(server,username,TXT_OPS_NOTIFY,
 		   title,primary,secondary);
 }
+#endif
 
 #ifdef HAVE_GREGEX_H
 
@@ -151,6 +154,29 @@ const char *convert_otr_msg(const char *msg)
 
 #endif
 
+void ops_handle_msg(void *opdata, OtrlMessageEvent msg_event,
+			ConnContext *co, const char *msg,
+			gcry_error_t err)
+{
+	IRC_CTX *server = opdata;
+	struct co_info *coi;
+
+	if (co) {
+		coi = co->app_data;
+		server = coi->ircctx;
+	} else 
+		otr_notice(server, co->username, TXT_OPS_DISPLAY_BUG);
+
+#ifdef HAVE_GREGEX_H
+	msg = convert_otr_msg(msg);
+	otr_notice(server, co->username, TXT_OPS_DISPLAY, msg);
+	g_free((char*)msg);
+#else
+	otr_notice(server, co->username, TXT_OPS_DISPLAY, msg);
+#endif
+}
+
+#if 0
 /*
  * OTR message. E.g. "following has been transmitted in clear: ...".
  * We're trying to kill the ugly HTML.
@@ -179,6 +205,7 @@ int ops_display_msg(void *opdata, const char *accountname,
 
 	return 0;
 }
+#endif
 
 /* 
  * Gone secure.
@@ -232,14 +259,6 @@ void ops_still_secure(void *opdata, ConnContext *context, int is_reply)
 }
 
 /*
- * OTR log message. IIRC heartbeats are of this category.
- */
-void ops_log(void *opdata, const char *message)
-{
-//	otr_infost(TXT_OPS_LOG,message);
-}
-
-/*
  * Really critical with IRC. 
  * Unfortunately, we can't tell our peer which size to use.
  * (reminds me of MTU determination...)
@@ -284,12 +303,10 @@ void otr_initops() {
 	otr_ops.policy = ops_policy;
 	otr_ops.create_privkey = ops_create_privkey;
 	otr_ops.inject_message = ops_inject_msg;
-	otr_ops.notify = ops_notify;
-	otr_ops.display_otr_message = ops_display_msg;
+	otr_ops.handle_msg_event = ops_handle_msg;
 	otr_ops.gone_secure = ops_secure;
 	otr_ops.gone_insecure = ops_insecure;
 	otr_ops.still_secure = ops_still_secure;
-	otr_ops.log_message = ops_log;
 	otr_ops.max_message_size = ops_max_msg;
 	otr_ops.update_context_list = ops_up_ctx_list;
 	otr_ops.write_fingerprints = ops_writefps;
