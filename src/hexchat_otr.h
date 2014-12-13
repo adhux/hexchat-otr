@@ -1,5 +1,5 @@
 #include "config.h"
-#include "hexchat-plugin.h"
+#include <hexchat-plugin.h>
 
 #define MODULE_NAME "otr"
 

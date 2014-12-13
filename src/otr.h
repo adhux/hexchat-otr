@@ -36,7 +36,7 @@
 
 /* hexchat */
 
-#include <hexchat_otr.h>
+#include "hexchat_otr.h"
 
 /* log stuff */
 
