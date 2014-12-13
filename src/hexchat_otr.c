@@ -10,6 +10,32 @@ static char set_policy_known[512] = IO_DEFAULT_POLICY_KNOWN;
 static char set_ignore[512] = IO_DEFAULT_IGNORE;
 static int set_finishonunload = TRUE;
 
+static int
+get_current_context_type (void)
+{
+    int type = 0;
+    hexchat_list *list;
+    hexchat_context *cur_ctx;
+
+    list = hexchat_list_get (ph, "channels");
+    if (!list)
+        return 0;
+
+    cur_ctx = hexchat_get_context (ph);
+
+    while (hexchat_list_next (ph, list))
+    {
+        if ((hexchat_context*)hexchat_list_str (ph, list, "context") == cur_ctx)
+        {
+            type = hexchat_list_int (ph, list, "type");
+            break;
+        }
+    }
+
+    hexchat_list_free (ph, list);
+    return type;
+}
+
 int extract_nick (char *nick, char *line, size_t nick_size)
 {
 	char *excl;
@@ -157,7 +183,7 @@ int hook_outgoing (char *word[], char *word_eol[], void *userdata)
 		.address = (char *)server
 	};
 
-	if ((*channel == '&') || (*channel == '#'))
+	if (get_current_context_type () != 3) /* Not PM */
 		return HEXCHAT_EAT_NONE;
 
 	if (g_regex_match (regex_nickignore, channel, 0, NULL))
@@ -192,8 +218,7 @@ int hook_privmsg (char *word[], char *word_eol[], void *userdata)
 	};
 	hexchat_context *query_ctx;
 
-	char *chanmsg = word[3];
-	if ((*chanmsg == '&') || (*chanmsg == '#'))
+	if (get_current_context_type () != 3) /* Not PM */
 		return HEXCHAT_EAT_NONE;
 	if (!extract_nick (nick, word[1], sizeof(nick)))
 		return HEXCHAT_EAT_NONE;
