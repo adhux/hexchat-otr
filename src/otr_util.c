@@ -28,6 +28,8 @@ GSList *plistunknown = NULL;
 GSList *plistknown = NULL;
 GRegex *regex_policies = NULL;
 
+#define MSGQUEUE_LEN 4096
+
 /*
  * init otr lib.
  */
@@ -716,7 +718,7 @@ char *otr_receive (IRC_CTX *ircctx, const char *msg, const char *from)
 	 */
 	if (coi->msgqueue)
 	{ /* already something in the queue */
-		strcpy (coi->msgqueue + strlen (coi->msgqueue), msg);
+		g_strlcat (coi->msgqueue, msg, MSGQUEUE_LEN);
 
 		/* wait for more? */
 		if ((strlen (msg) > OTR_MAX_MSG_SIZE) && (msg[strlen (msg) - 1] != '.') && (msg[strlen (msg) - 1] != ','))
@@ -734,8 +736,8 @@ char *otr_receive (IRC_CTX *ircctx, const char *msg, const char *from)
 	}
 	else if (strstr (msg, "?OTR:") && (strlen (msg) > OTR_MAX_MSG_SIZE) && (msg[strlen (msg) - 1] != '.') && (msg[strlen (msg) - 1] != ','))
 	{
-		coi->msgqueue = malloc (4096 * sizeof(char));
-		strcpy (coi->msgqueue, msg);
+		coi->msgqueue = g_malloc (MSGQUEUE_LEN);
+		g_strlcpy (coi->msgqueue, msg, MSGQUEUE_LEN);
 		otr_debug (ircctx, from, TXT_RECEIVE_QUEUED, strlen (msg));
 		return NULL;
 	}

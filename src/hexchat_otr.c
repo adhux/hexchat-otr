@@ -10,14 +10,14 @@ static char set_policy_known[512] = IO_DEFAULT_POLICY_KNOWN;
 static char set_ignore[512] = IO_DEFAULT_IGNORE;
 static int set_finishonunload = TRUE;
 
-int extract_nick (char *nick, char *line)
+int extract_nick (char *nick, char *line, size_t nick_size)
 {
 	char *excl;
 
 	if (*line++ != ':')
 		return FALSE;
 
-	strcpy (nick, line);
+	g_strlcpy (nick, line, nick_size);
 
 	if ((excl = strchr (nick, '!')))
 		*excl = '\0';
@@ -112,19 +112,19 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 		if (strcmp (word[3], "policy") == 0)
 		{
 			otr_setpolicies (word_eol[4], FALSE);
-			strcpy (set_policy, word_eol[4]);
+			g_strlcpy (set_policy, word_eol[4], sizeof(set_policy));
 		}
 		else if (strcmp (word[3], "policy_known") == 0)
 		{
 			otr_setpolicies (word_eol[4], TRUE);
-			strcpy (set_policy_known, word_eol[4]);
+			g_strlcpy (set_policy_known, word_eol[4], sizeof(set_policy_known));
 		}
 		else if (strcmp (word[3], "ignore") == 0)
 		{
 			if (regex_nickignore)
 				g_regex_unref (regex_nickignore);
 			regex_nickignore = g_regex_new (word_eol[4], 0, 0, NULL);
-			strcpy (set_ignore, word_eol[4]);
+			g_strlcpy (set_ignore, word_eol[4], sizeof(set_ignore));
 		}
 		else if (strcmp (word[3], "finishonunload") == 0)
 		{
@@ -195,7 +195,7 @@ int hook_privmsg (char *word[], char *word_eol[], void *userdata)
 	char *chanmsg = word[3];
 	if ((*chanmsg == '&') || (*chanmsg == '#'))
 		return HEXCHAT_EAT_NONE;
-	if (!extract_nick (nick, word[1]))
+	if (!extract_nick (nick, word[1], sizeof(nick)))
 		return HEXCHAT_EAT_NONE;
 
 	if (g_regex_match (regex_nickignore, nick, 0, NULL))
