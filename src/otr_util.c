@@ -774,5 +774,4 @@ void otr_setpolicies(const char *policies, int known)
 		plistknown = plist;
 	else
 		plistunknown = plist;
-#endif
 }
