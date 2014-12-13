@@ -36,7 +36,7 @@ OtrlPolicy ops_policy (void *opdata, ConnContext *context)
 	GSList *pl;
 	char fullname[1024];
 
-	sprintf (fullname, "%s@%s", context->username, server);
+	g_snprintf (fullname, sizeof(fullname), "%s@%s", context->username, server);
 
 	/* loop through otr_policy */
 

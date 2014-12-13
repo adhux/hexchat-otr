@@ -106,7 +106,8 @@ void context_add_app_info (void *data, ConnContext *co)
 	co->app_data_free = context_free_app_info;
 
 	coi->ircctx = ircctx;
-	sprintf (coi->better_msg_two, formats[TXT_OTR_BETTER_TWO].def, co->accountname);
+	g_snprintf (coi->better_msg_two, sizeof(coi->better_msg_two),
+				formats[TXT_OTR_BETTER_TWO].def, co->accountname);
 }
 
 /*
@@ -147,7 +148,7 @@ char *otr_send (IRC_CTX *ircctx, const char *msg, const char *to)
 	ConnContext *co;
 	char accname[256];
 
-	sprintf (accname, "%s@%s", nick, address);
+	g_snprintf (accname, sizeof(accname), "%s@%s", nick, address);
 
 	if (!(co = otr_getcontext (accname, to, FALSE, ircctx)))
 	{
@@ -255,7 +256,7 @@ int otr_getstatus (char *mynick, char *nick, char *server)
 	ConnContext *co;
 	char accname[128];
 
-	sprintf (accname, "%s@%s", mynick, server);
+	g_snprintf (accname, sizeof(accname), "%s@%s", mynick, server);
 
 	if (!(co = otr_getcontext (accname, nick, FALSE, NULL)))
 	{
@@ -316,7 +317,7 @@ void otr_finish (IRC_CTX *ircctx, char *nick, const char *peername, int inquery)
 		nick = (char *)peername;
 	}
 
-	sprintf ((char *)accname, "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
+	g_snprintf (accname, sizeof(accname), "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
 
 	if (!(co = otr_getcontext (accname, nick, FALSE, NULL)))
 	{
@@ -401,7 +402,7 @@ void otr_trust (IRC_CTX *ircctx, char *nick, const char *peername)
 		nick = (char *)peername;
 	}
 
-	sprintf ((char *)accname, "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
+	g_snprintf (accname, sizeof(accname), "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
 
 	if (!(co = otr_getcontext (accname, nick, FALSE, NULL)))
 	{
@@ -461,7 +462,7 @@ void otr_authabort (IRC_CTX *ircctx, char *nick, const char *peername)
 		nick = (char *)peername;
 	}
 
-	sprintf ((char *)accname, "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
+	g_snprintf (accname, sizeof(accname), "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
 
 	if (!(co = otr_getcontext (accname, nick, FALSE, NULL)))
 	{
@@ -500,7 +501,7 @@ void otr_auth (IRC_CTX *ircctx, char *nick, const char *peername, const char *se
 		nick = (char *)peername;
 	}
 
-	sprintf ((char *)accname, "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
+	g_snprintf (accname, sizeof(accname), "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
 
 	if (!(co = otr_getcontext (accname, nick, FALSE, NULL)))
 	{
@@ -691,7 +692,7 @@ char *otr_receive (IRC_CTX *ircctx, const char *msg, const char *from)
 	struct co_info *coi;
 	OtrlTLV *tlvs;
 
-	sprintf (accname, "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
+	g_snprintf (accname, sizeof(accname), "%s@%s", IRCCTX_NICK (ircctx), IRCCTX_ADDR (ircctx));
 
 	if (!(co = otr_getcontext (accname, from, TRUE, ircctx)))
 	{

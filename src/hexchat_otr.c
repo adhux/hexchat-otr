@@ -328,8 +328,8 @@ void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)
 
 	hexchat_set_context (ph, find_query_ctx);
 
-	if (vsnprintf (s, LOGMAX, formats[fnum].def, params) < 0)
-		sprintf (s, "internal error parsing error string (BUG)");
+	if (vsnprintf (msg, sizeof(msg), formats[fnum].def, params) < 0)
+		g_snprintf (msg, sizeof(msg), "internal error parsing error string (BUG)");
 	va_end (params);
 	hexchat_printf (ph, "OTR: %s", s);
 }

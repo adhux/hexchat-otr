@@ -72,7 +72,7 @@ void keygen_childwatch (GPid pid, gint status, gpointer data)
 		{
 			char sigstr[16];
 
-			sprintf (sigstr,
+			g_snprintf (sigstr, sizeof(sigstr),
 #ifndef HAVE_STRSIGNAL
 					 "%d", WTERMSIG (status));
 #else
