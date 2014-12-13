@@ -69,19 +69,7 @@ void keygen_childwatch (GPid pid, gint status, gpointer data)
 	if (ret == 0)
 	{
 		if (WIFSIGNALED (status))
-		{
-			char sigstr[16];
-
-			g_snprintf (sigstr, sizeof(sigstr),
-#ifndef HAVE_STRSIGNAL
-					 "%d", WTERMSIG (status));
-#else
-					 "%s", strsignal (WTERMSIG (status)));
-#endif
-			otr_noticest (TXT_KG_EXITSIG,
-						  kg_st.accountname,
-						  sigstr);
-		}
+			otr_noticest (TXT_KG_EXITSIG, kg_st.accountname, g_strsignal (WTERMSIG (status)));
 		else
 			otr_noticest (TXT_KG_EXITED, kg_st.accountname);
 	}
