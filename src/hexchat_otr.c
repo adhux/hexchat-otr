@@ -124,14 +124,11 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 	else if (strcmp (cmd, "auth") == 0)
 	{
 		if (!word[3] || !*word[3])
-		{
-			otr_notice (ircctx, target,
-						TXT_CMD_AUTH);
-		}
+			otr_notice (ircctx, target, TXT_CMD_AUTH);
 		else if (word[4] && *word[4] && strchr (word[3], '@'))
-			otr_auth (NULL, NULL, word_eol[4], word[3]);
+			otr_auth (NULL, NULL, word_eol[4], NULL, word[3]);
 		else
-			otr_auth (ircctx, target, NULL, word_eol[3]);
+			otr_auth (ircctx, target, NULL, NULL, word_eol[3]);
 	}
 	else if (strcmp (cmd, "set") == 0)
 	{
@@ -319,6 +316,11 @@ int hexchat_plugin_deinit ()
 	otrlib_deinit ();
 
 	return 1;
+}
+
+void otr_log(IRC_CTX *server, const char *nick, int level, const char *format, ...)
+{
+	/* TODO: Implement me! */
 }
 
 void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)

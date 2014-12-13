@@ -46,6 +46,7 @@ int otrlib_init ()
 
 	/* load keys and fingerprints */
 
+	instag_load ();
 	key_load ();
 	fps_load ();
 
@@ -251,47 +252,66 @@ struct ctxlist_ *otr_contexts ()
 /*
  * Get the OTR status of this conversation.
  */
-int otr_getstatus (char *mynick, char *nick, char *server)
+int otr_getstatus(IRC_CTX *ircctx, const char *nick)
 {
 	ConnContext *co;
 	char accname[128];
+	struct co_info *coi;
 
-	g_snprintf (accname, sizeof(accname), "%s@%s", mynick, server);
+	g_snprintf (accname, sizeof(accname), "%s@%s", ircctx->nick, ircctx->address);
 
-	if (!(co = otr_getcontext (accname, nick, FALSE, NULL)))
+	if (!(co = otr_getcontext(accname, nick, FALSE, ircctx)))
 	{
-		return 0;
+		return IO_ST_PLAINTEXT;
 	}
+
+	coi = co->app_data;
 
 	switch (co->msgstate)
 	{
 	case OTRL_MSGSTATE_PLAINTEXT:
-		return TXT_ST_PLAINTEXT;
+		return IO_ST_PLAINTEXT;
 	case OTRL_MSGSTATE_ENCRYPTED:
 	{
 		char *trust = co->active_fingerprint->trust;
 		int ex = co->smstate->nextExpected;
-
-		if (trust && (*trust != '\0'))
-			return strcmp (trust, "smp") == 0 ? TXT_ST_TRUST_SMP : TXT_ST_TRUST_MANUAL;
+		int code = 0;
 
 		switch (ex)
 		{
 		case OTRL_SMP_EXPECT1:
-			return TXT_ST_UNTRUSTED;
+			if (coi->received_smp_init)
+				code = IO_ST_SMP_INCOMING;
+			break;
 		case OTRL_SMP_EXPECT2:
-			return TXT_ST_SMP_WAIT_2;
+			code = IO_ST_SMP_OUTGOING;
+			break;
 		case OTRL_SMP_EXPECT3:
 		case OTRL_SMP_EXPECT4:
-			return TXT_ST_SMP_FINALIZE;
+			code = IO_ST_SMP_FINALIZE;
+			break;
 		default:
-			return TXT_ST_SMP_UNKNOWN;
+			otr_logst(
+				MSGLEVEL_CRAP,
+				"Encountered unknown SMP state in libotr, please let maintainers know");
+			return IO_ST_UNKNOWN;
 		}
+
+		if (trust && (*trust != '\0'))
+			code |= strcmp(trust, "smp") == 0 ? IO_ST_TRUST_SMP :
+				IO_ST_TRUST_MANUAL;
+		else
+			code |= IO_ST_UNTRUSTED;
+
+		return code;
 	}
 	case OTRL_MSGSTATE_FINISHED:
-		return TXT_ST_FINISHED;
+		return IO_ST_FINISHED;
 	default:
-		return TXT_ST_UNKNOWN;
+		otr_logst(
+			MSGLEVEL_CRAP,
+			"BUG Found! Please write us a mail and describe how you got here");
+		return IO_ST_UNKNOWN;
 	}
 }
 
@@ -345,6 +365,21 @@ void otr_finish (IRC_CTX *ircctx, char *nick, const char *peername, int inquery)
 
 	/* finish if /otr finish has been issued. Reset if
 	 * we're called cause the query window has been closed. */
+	if (coi)
+		coi->finished = inquery;
+
+	/* write the finished into the master as well */
+	co = otrl_context_find(
+		otr_state,
+		nick,
+		accname,
+		PROTOCOLID,
+		OTRL_INSTAG_MASTER,
+		FALSE,
+		NULL,
+		NULL,
+		NULL);
+	coi = co->app_data;
 	if (coi)
 		coi->finished = inquery;
 
@@ -482,7 +517,8 @@ void otr_authabort (IRC_CTX *ircctx, char *nick, const char *peername)
 /*
  * Initiate or respond to SMP authentication.
  */
-void otr_auth (IRC_CTX *ircctx, char *nick, const char *peername, const char *secret)
+void otr_auth (IRC_CTX *ircctx, char *nick, const char *peername, const char *question,
+								const char *secret)
 {
 	ConnContext *co;
 	char accname[128];
@@ -538,13 +574,23 @@ void otr_auth (IRC_CTX *ircctx, char *nick, const char *peername, const char *se
 	}
 
 	if (!coi->received_smp_init)
-		otrl_message_initiate_smp (
-			otr_state,
-			&otr_ops,
-			ircctx,
-			co,
-			(unsigned char *)secret,
-			strlen (secret));
+		if (question)
+			otrl_message_initiate_smp_q(
+				otr_state,
+				&otr_ops,
+				ircctx,
+				co,
+				question,
+				(unsigned char*)secret,
+				strlen (secret));
+		else
+			otrl_message_initiate_smp (
+				otr_state,
+				&otr_ops,
+				ircctx,
+				co,
+				(unsigned char *)secret,
+				strlen (secret));
 	else
 		otrl_message_respond_smp (
 			otr_state,
@@ -561,121 +607,6 @@ void otr_auth (IRC_CTX *ircctx, char *nick, const char *peername, const char *se
 
 	if (peername)
 		*pserver = '@';
-}
-
-/* 
- * Handles incoming TLVs of the SMP authentication type. We're not only updating
- * our own state but also giving libotr a leg up so it gets through the auth.
- */
-void otr_handle_tlvs (OtrlTLV *tlvs, ConnContext *co,
-					  struct co_info *coi,
-					  IRC_CTX *ircctx, const char *from)
-{
-	int abort = FALSE;
-
-	OtrlTLV *tlv = otrl_tlv_find (tlvs, OTRL_TLV_SMP1);
-	if (tlv)
-	{
-		if (co->smstate->nextExpected != OTRL_SMP_EXPECT1)
-		{
-			otr_notice (ircctx, from, TXT_AUTH_HAVE_OLD,
-						from);
-			abort = TRUE;
-		}
-		else
-		{
-			otr_notice (ircctx, from, TXT_AUTH_PEER,
-						from);
-			coi->received_smp_init = TRUE;
-		}
-	}
-
-	tlv = otrl_tlv_find (tlvs, OTRL_TLV_SMP2);
-	if (tlv)
-	{
-		if (co->smstate->nextExpected != OTRL_SMP_EXPECT2)
-		{
-			otr_notice (ircctx, from,
-						TXT_AUTH_PEER_REPLY_WRONG,
-						from);
-			abort = TRUE;
-		}
-		else
-		{
-			otr_notice (ircctx, from,
-						TXT_AUTH_PEER_REPLIED,
-						from);
-			co->smstate->nextExpected = OTRL_SMP_EXPECT4;
-		}
-	}
-
-	tlv = otrl_tlv_find (tlvs, OTRL_TLV_SMP3);
-	if (tlv)
-	{
-		if (co->smstate->nextExpected != OTRL_SMP_EXPECT3)
-		{
-			otr_notice (ircctx, from,
-						TXT_AUTH_PEER_WRONG_SMP3,
-						from);
-			abort = TRUE;
-		}
-		else
-		{
-			char *trust = co->active_fingerprint->trust;
-			if (trust && (*trust != '\0'))
-			{
-				otr_notice (ircctx, from,
-							TXT_AUTH_SUCCESSFUL);
-			}
-			else
-			{
-				otr_notice (ircctx, from,
-							TXT_AUTH_FAILED);
-				coi->smp_failed = TRUE;
-			}
-			co->smstate->nextExpected = OTRL_SMP_EXPECT1;
-			coi->received_smp_init = FALSE;
-		}
-	}
-
-	tlv = otrl_tlv_find (tlvs, OTRL_TLV_SMP4);
-	if (tlv)
-	{
-		if (co->smstate->nextExpected != OTRL_SMP_EXPECT4)
-		{
-			otr_notice (ircctx, from,
-						TXT_AUTH_PEER_WRONG_SMP4,
-						from);
-			abort = TRUE;
-		}
-		else
-		{
-			char *trust = co->active_fingerprint->trust;
-			if (trust && (*trust != '\0'))
-			{
-				otr_notice (ircctx, from,
-							TXT_AUTH_SUCCESSFUL);
-			}
-			else
-			{
-				/* unreachable since 4 is never sent out on
-				 * error */
-				otr_notice (ircctx, from,
-							TXT_AUTH_FAILED);
-				coi->smp_failed = TRUE;
-			}
-			co->smstate->nextExpected = OTRL_SMP_EXPECT1;
-			coi->received_smp_init = FALSE;
-		}
-	}
-	if (abort)
-		otr_abort_auth (co, ircctx, from);
-
-	tlv = otrl_tlv_find (tlvs, OTRL_TLV_DISCONNECTED);
-	if (tlv)
-		otr_notice (ircctx, from, TXT_PEER_FINISHED, from);
-
-	statusbar_items_redraw ("otr");
 }
 
 /*
@@ -758,7 +689,14 @@ char *otr_receive (IRC_CTX *ircctx, const char *msg, const char *from)
 		NULL);
 
 	if (tlvs)
-		otr_handle_tlvs (tlvs, co, coi, ircctx, from);
+	{
+		OtrlTLV *tlv = otrl_tlv_find (tlvs, OTRL_TLV_DISCONNECTED);
+		if (tlv)
+		{
+			otr_status_change (ircctx, from, IO_STC_PEER_FINISHED);
+			otr_notice (ircctx, from, TXT_PEER_FINISHED, from);
+		}
+	}
 
 	if (ignore_message)
 	{

@@ -69,11 +69,82 @@ void otr_log (IRC_CTX *server, const char *to,
 #define KEYFILE "/otr/otr.key"
 #define TMPKEYFILE "/otr/otr.key.tmp"
 #define FPSFILE "/otr/otr.fp"
+#define INSTAGFILE "/otr/otr.instag"
 
 /* some defaults */
 #define IO_DEFAULT_POLICY "*@localhost opportunistic,*bitlbee* opportunistic,*@im.* opportunistic, *serv@irc* never"
 #define IO_DEFAULT_POLICY_KNOWN "* always"
 #define IO_DEFAULT_IGNORE "xmlconsole[0-9]*"
+
+static const char * const otr_msg_event_txt[] = {
+	"NONE",
+	"ENCRYPTION_REQUIRED",
+	"ENCRYPTION_ERROR",
+	"CONNECTION_ENDED",
+	"SETUP_ERROR",
+	"MSG_REFLECTED",
+	"MSG_RESENT",
+	"RCVDMSG_NOT_IN_PRIVATE",
+	"RCVDMSG_UNREADABLE",
+	"RCVDMSG_MALFORMED",
+	"LOG_HEARTBEAT_RCVD",
+	"LOG_HEARTBEAT_SENT",
+	"RCVDMSG_GENERAL_ERR",
+	"RCVDMSG_UNENCRYPTED",
+	"RCVDMSG_UNRECOGNIZED",
+	"RCVDMSG_FOR_OTHER_INSTANCE"
+};
+
+static const char * const otr_status_txt[] = {
+	"FINISHED",
+	"TRUST_MANUAL",
+	"TRUST_SMP",
+	"SMP_ABORT",
+	"SMP_STARTED",
+	"SMP_RESPONDED",
+	"SMP_INCOMING",
+	"SMP_FINALIZE",
+	"SMP_ABORTED",
+	"PEER_FINISHED",
+	"SMP_FAILED",
+	"SMP_SUCCESS",
+	"GONE_SECURE",
+	"GONE_INSECURE",
+	"CTX_UPDATE"
+};
+
+/* returned by otr_getstatus */
+enum {
+	IO_ST_PLAINTEXT,
+	IO_ST_FINISHED,
+	IO_ST_SMP_INCOMING,
+	IO_ST_SMP_OUTGOING,
+	IO_ST_SMP_FINALIZE,
+	IO_ST_UNKNOWN,
+	IO_ST_UNTRUSTED=32,
+	IO_ST_TRUST_MANUAL=64,
+	IO_ST_TRUST_SMP=128,
+	IO_ST_SMP_ONGOING= IO_ST_SMP_INCOMING|IO_ST_SMP_OUTGOING|IO_ST_SMP_FINALIZE
+};
+
+/* given to otr_status_change */
+enum {
+	IO_STC_FINISHED,
+	IO_STC_TRUST_MANUAL,
+	IO_STC_TRUST_SMP,
+	IO_STC_SMP_ABORT,
+	IO_STC_SMP_STARTED,
+	IO_STC_SMP_RESPONDED,
+	IO_STC_SMP_INCOMING,
+	IO_STC_SMP_FINALIZE,
+	IO_STC_SMP_ABORTED,
+	IO_STC_PEER_FINISHED,
+	IO_STC_SMP_FAILED,
+	IO_STC_SMP_SUCCESS,
+	IO_STC_GONE_SECURE,
+	IO_STC_GONE_INSECURE,
+	IO_STC_CTX_UPDATE
+};
 
 /* one for each OTR context (=communication pair) */
 struct co_info
@@ -131,6 +202,7 @@ extern int debug;
 
 void irc_send_message (IRC_CTX *ircctx, const char *recipient, char *msg);
 IRC_CTX *server_find_address (char *address);
+void otr_status_change (IRC_CTX *ircctx, const char *nick, int event);
 
 /* init stuff */
 
@@ -143,15 +215,16 @@ void otr_setpolicies (const char *policies, int known);
 
 char *otr_send (IRC_CTX *server, const char *msg, const char *to);
 char *otr_receive (IRC_CTX *server, const char *msg, const char *from);
-int otr_getstatus (char *mynick, char *nick, char *server);
+int otr_getstatus(IRC_CTX *ircctx, const char *nick);
 ConnContext *otr_getcontext (const char *accname, const char *nick, int create, void *data);
 
 /* user interaction */
 
 void otr_trust (IRC_CTX *server, char *nick, const char *peername);
 void otr_finish (IRC_CTX *server, char *nick, const char *peername, int inquery);
-void otr_auth (IRC_CTX *server, char *nick, const char *peername, const char *secret);
+void otr_auth (IRC_CTX *server, char *nick, const char *peername, const char *question, const char *secret);
 void otr_authabort (IRC_CTX *server, char *nick, const char *peername);
+void otr_abort_auth(ConnContext *co, IRC_CTX *ircctx, const char *nick);
 struct ctxlist_ *otr_contexts ();
 void otr_finishall ();
 
@@ -162,3 +235,7 @@ void keygen_abort ();
 void key_load ();
 void fps_load ();
 void otr_writefps ();
+
+/* instance tags */
+void instag_load ();
+void otr_writeinstags ();

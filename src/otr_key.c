@@ -315,3 +315,55 @@ void fps_load ()
 	}
 	g_free (filename);
 }
+
+/*
+ * Write instance tags to file.
+ */
+void otr_writeinstags(void)
+{
+	gcry_error_t err;
+	char *filename = g_strconcat(get_irssi_dir (), INSTAGFILE, NULL);
+
+	err = otrl_instag_write (otr_state, filename);
+
+	if (err == GPG_ERR_NO_ERROR)
+	{
+		otr_noticest(TXT_INSTAG_SAVED);
+	}
+	else
+	{
+		otr_noticest(TXT_INSTAG_SAVE_ERROR,
+			     gcry_strerror(err),
+			     gcry_strsource(err));
+	}
+	g_free(filename);
+}
+
+/*
+ * Load instance tags.
+ */
+void instag_load(void)
+{
+	gcry_error_t err;
+	char *filename = g_strconcat(get_irssi_dir (), INSTAGFILE, NULL);
+
+	if (!g_file_test(filename, G_FILE_TEST_EXISTS))
+	{
+		otr_noticest(TXT_INSTAG_NOT_FOUND);
+		return;
+	}
+
+	err = otrl_instag_read(otr_state, filename);
+
+	if (err == GPG_ERR_NO_ERROR)
+	{
+		otr_noticest(TXT_INSTAG_LOADED);
+	}
+	else
+	{
+		otr_noticest(TXT_INSTAG_LOAD_ERROR,
+			     gcry_strerror(err),
+			     gcry_strsource(err));
+	}
+	g_free(filename);
+}

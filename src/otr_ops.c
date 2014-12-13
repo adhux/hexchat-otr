@@ -113,29 +113,6 @@ void ops_inject_msg (void *opdata, const char *accountname,
 	g_free (msgcopy);
 }
 
-#if 0
-/*
- * OTR notification. Haven't seen one yet.
- */
-void ops_notify(void *opdata, OtrlNotifyLevel level, const char *accountname, 
-		const char *protocol, const char *username, 
-		const char *title, const char *primary, 
-		const char *secondary)
-{
-	ConnContext *co = otr_getcontext(accountname,username,FALSE,NULL);
-	IRC_CTX *server = opdata;
-	struct co_info *coi;
-	if (co) {
-		coi = co->app_data;
-		server = coi->ircctx;
-	} else 
-		otr_notice(server,username,TXT_OPS_NOTIFY_BUG);
-
-	otr_notice(server,username,TXT_OPS_NOTIFY,
-		   title,primary,secondary);
-}
-#endif
-
 /* This is kind of messy. */
 const char *convert_otr_msg (const char *msg)
 {
@@ -152,24 +129,15 @@ const char *convert_otr_msg (const char *msg)
 	return msg;
 }
 
-void ops_handle_msg (void *opdata, OtrlMessageEvent msg_event,
-					 ConnContext *co, const char *msg,
-					 gcry_error_t err)
+void ops_handle_msg_event(void *opdata, OtrlMessageEvent msg_event,
+			  ConnContext *context, const char *message,
+			  gcry_error_t err)
 {
 	IRC_CTX *server = opdata;
-	struct co_info *coi;
+	char *username = context->username;
 
-	if (co)
-	{
-		coi = co->app_data;
-		server = coi->ircctx;
-	}
-	else
-		otr_notice (server, co->username, TXT_OPS_DISPLAY_BUG);
-
-	msg = convert_otr_msg (msg);
-	otr_notice (server, co->username, TXT_OPS_DISPLAY, msg);
-	g_free ((char *)msg);
+	otr_debug (server, username,
+		  TXT_OPS_HANDLE_MSG, otr_msg_event_txt[msg_event], message);
 }
 
 /* 
@@ -231,6 +199,13 @@ int ops_max_msg (void *opdata, ConnContext *context)
 	return OTR_MAX_MSG_SIZE;
 }
 
+void ops_create_instag (void *opdata, const char *accountname, const char *protocol)
+{
+	otrl_instag_generate(otr_state, "/dev/null",
+			     		accountname, protocol);
+	otr_writeinstags(otr_state);
+}
+
 /*
  * A context changed. 
  * I believe this is not happening for the SMP expects.
@@ -257,6 +232,61 @@ int ops_is_logged_in (void *opdata, const char *accountname,
 	return TRUE;
 }
 
+void otr_status_change (IRC_CTX *ircctx, const char *nick, int event)
+{
+	/* TODO: ? */
+}
+
+void ops_smp_event(void *opdata, OtrlSMPEvent smp_event,
+		   ConnContext *context, unsigned short progress_percent,
+		   char *question)
+{
+	IRC_CTX *ircctx = (opdata);
+	char *from = context->username;
+	struct co_info *coi = context->app_data;
+
+	coi->received_smp_init =
+		(smp_event == OTRL_SMPEVENT_ASK_FOR_SECRET) ||
+		(smp_event == OTRL_SMPEVENT_ASK_FOR_ANSWER);
+
+	switch (smp_event) {
+	case OTRL_SMPEVENT_ASK_FOR_SECRET:
+		otr_notice(ircctx, from, TXT_AUTH_PEER,
+			   from);
+		otr_status_change(ircctx, from, IO_STC_SMP_INCOMING);
+		break;
+	case OTRL_SMPEVENT_ASK_FOR_ANSWER:
+		otr_notice(ircctx, from, TXT_AUTH_PEER_QA, from, question);
+		otr_status_change(ircctx, from, IO_STC_SMP_INCOMING);
+		break;
+	case OTRL_SMPEVENT_IN_PROGRESS:
+		otr_notice(ircctx, from,
+			   TXT_AUTH_PEER_REPLIED,
+			   from);
+		otr_status_change(ircctx, from, IO_STC_SMP_FINALIZE);
+		break;
+	case OTRL_SMPEVENT_SUCCESS:
+		otr_notice(ircctx, from,
+			   TXT_AUTH_SUCCESSFUL);
+		otr_status_change(ircctx, from, IO_STC_SMP_SUCCESS);
+		break;
+	case OTRL_SMPEVENT_ABORT:
+		otr_abort_auth(context, ircctx, from);
+		otr_status_change(ircctx, from, IO_STC_SMP_ABORTED);
+		break;
+	case OTRL_SMPEVENT_FAILURE:
+	case OTRL_SMPEVENT_CHEATED:
+	case OTRL_SMPEVENT_ERROR:
+		otr_notice(ircctx, from, TXT_AUTH_FAILED);
+		coi->smp_failed = TRUE;
+		otr_status_change(ircctx, from, IO_STC_SMP_FAILED);
+		break;
+	default:
+		otr_logst(MSGLEVEL_CRAP, "Received unknown SMP event");
+		break;
+	}
+}
+
 /*
  * Initialize our OtrlMessageAppOps
  */
@@ -267,7 +297,9 @@ void otr_initops ()
 	otr_ops.policy = ops_policy;
 	otr_ops.create_privkey = ops_create_privkey;
 	otr_ops.inject_message = ops_inject_msg;
-	otr_ops.handle_msg_event = ops_handle_msg;
+	otr_ops.handle_msg_event = ops_handle_msg_event;
+ 	otr_ops.create_instag = ops_create_instag;
+ 	otr_ops.handle_smp_event = ops_smp_event;
 	otr_ops.gone_secure = ops_secure;
 	otr_ops.gone_insecure = ops_insecure;
 	otr_ops.still_secure = ops_still_secure;
