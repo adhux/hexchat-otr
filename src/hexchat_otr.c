@@ -141,9 +141,18 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 		if (!word[3] || !*word[3])
 			otr_notice (ircctx, target, TXT_CMD_AUTH);
 		else if (word[4] && *word[4] && strchr (word[3], '@'))
-			otr_auth (NULL, NULL, word_eol[4], NULL, word[3]);
+			otr_auth (NULL, NULL, word[3], NULL, word_eol[4]);
 		else
 			otr_auth (ircctx, target, NULL, NULL, word_eol[3]);
+	}
+	else if (strcmp (cmd, "authq") == 0)
+	{
+		if (!word[3] || !*word[3] || !word[4] || !*word[4])
+			otr_notice (ircctx, target, TXT_CMD_AUTH);
+		else if (word[5] && *word[5] && strchr (word[3], '@'))
+			otr_auth (NULL, NULL, word[3], word[5], word[4]);
+		else
+			otr_auth (ircctx, target, NULL, word[4], word_eol[5]);
 	}
 	else if (strcmp (cmd, "set") == 0)
 	{
