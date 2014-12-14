@@ -56,6 +56,17 @@ void irc_send_message (IRC_CTX *ircctx, const char *recipient, char *msg)
 	hexchat_commandf (ph, "PRIVMSG %s :%s", recipient, msg);
 }
 
+static void cmd_start (const char *nick)
+{
+	if (get_current_context_type () != 3)
+	{
+		hexchat_print (ph, "OTR: You can only use OTR in a dialog\n");
+		return;
+	}
+
+	hexchat_commandf (ph, "quote PRIVMSG %s :?OTRv23?", nick);
+}
+
 int cmd_otr (char *word[], char *word_eol[], void *userdata)
 {
 	const char *own_nick = hexchat_get_info (ph, "nick");
@@ -79,6 +90,10 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 	{
 		debug = !debug;
 		otr_noticest (debug ? TXT_CMD_DEBUG_ON : TXT_CMD_DEBUG_OFF);
+	}
+	else if (strcmp (cmd, "start") == 0 || strcmp (cmd, "init") == 0)
+	{
+		cmd_start (target);
 	}
 	else if (strcmp (cmd, "version") == 0)
 	{
