@@ -13,27 +13,7 @@ static int set_finishonunload = TRUE;
 static int
 get_current_context_type (void)
 {
-    int type = 0;
-    hexchat_list *list;
-    hexchat_context *cur_ctx;
-
-    list = hexchat_list_get (ph, "channels");
-    if (!list)
-        return 0;
-
-    cur_ctx = hexchat_get_context (ph);
-
-    while (hexchat_list_next (ph, list))
-    {
-        if ((hexchat_context*)hexchat_list_str (ph, list, "context") == cur_ctx)
-        {
-            type = hexchat_list_int (ph, list, "type");
-            break;
-        }
-    }
-
-    hexchat_list_free (ph, list);
-    return type;
+	return hexchat_list_int (ph, NULL, "type");
 }
 
 int extract_nick (char *nick, char *line, size_t nick_size)
