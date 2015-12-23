@@ -213,11 +213,15 @@ int hook_privmsg (char *word[], char *word_eol[], void *userdata)
 	char *newmsg;
 	const char *server = hexchat_get_info (ph, "server");
 	const char *own_nick = hexchat_get_info (ph, "nick");
+	const char *chantypes = hexchat_list_str (ph, NULL, "chantypes");
 	IRC_CTX ircctx = {
 		.nick = (char *)own_nick,
 		.address = (char *)server
 	};
 	hexchat_context *query_ctx;
+
+	if (strchr (chantypes, word[3][0]) != NULL) /* Ignore channels */
+		return HEXCHAT_EAT_NONE;
 
 	if (!extract_nick (nick, word[1], sizeof(nick)))
 		return HEXCHAT_EAT_NONE;
