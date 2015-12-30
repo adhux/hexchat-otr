@@ -6,7 +6,16 @@
 #define PNAME "OTR"
 #define PDESC "Off-The-Record Messaging for Hexchat"
 #define PVERSION PACKAGE_VERSION
-#define OTR_HELP "OTR <version|finish|trust|auth|authabort|genkey|set>"
+#define OTR_HELP "OTR\n\
+    version: Prints version of plugin\n\
+    start: Starts an OTR chat (init also works)\n\
+    finish [<nick>]: Finish an OTR chat\n\
+    trust [<nick>]: Trusts the other user\n\
+    auth [<nick>] <password>: Auths a user via password\n\
+    authq [<nick>] <question> <answer>: Auths a user via question\n\
+    authabort [<nick>]: Aborts auth in progress\n\
+    genkey [abort|<accountname>]: Generates a new key\n\
+    set [<setting>]: Changes settings, run without args for current values"
 
 #define MAX_FORMAT_PARAMS 10
 
