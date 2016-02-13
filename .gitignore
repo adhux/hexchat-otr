@@ -25,6 +25,7 @@
 /autom4te.cache
 /aclocal.m4
 /ar-lib
+/build-aux
 /compile
 /configure
 /depcomp
@@ -42,6 +43,9 @@ stamp-it
 Makefile
 Makefile.in
 Makefile.in.in
+/m4
+/sub
+.dirstamp
 
 # Gettext
 /po/POTFILES
@@ -54,4 +58,4 @@ Makefile.in.in
 *~
 *.patch
 *.diff
-
+tags
