@@ -18,8 +18,8 @@ noinst_HEADERS = \
 	src/hexchat_otr.h
 
 src/otr-formats.h src/hexchat-formats.c: src/formats.txt
-	$(AM_V_GEN) python makeformats.py $<
+	$(AM_V_GEN) python src/makeformats.py $< src
 
 BUILT_SOURCES = src/otr-formats.h src/hexchat-formats.c
 
-EXTRA_DIST = $(BUILT_SOURCES) autogen.sh LICENSE src/formats.txt
+EXTRA_DIST = $(BUILT_SOURCES) autogen.sh LICENSE src/formats.txt src/makeformats.py

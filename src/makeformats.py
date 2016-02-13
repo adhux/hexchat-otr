@@ -9,8 +9,9 @@ import sys,os,re
 
 lines = map(lambda x: x.strip(),open(sys.argv[1],"r").readlines())
 
-hdr = open("otr-formats.h","w")
-srcx = open("hexchat-formats.c","w")
+out_dir = sys.argv[2] if len(sys.argv) > 2 or "."
+hdr = open(os.path.join(out_dir, "otr-formats.h"), "w")
+srcx = open(os.path.join(out_dir, "hexchat-formats.c"), "w")
 
 srcx.write('#include "otr.h"\n');
 srcx.write('FORMAT_REC formats[] = {\n\t')
