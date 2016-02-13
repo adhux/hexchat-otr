@@ -43,9 +43,6 @@ enum
 
 extern hexchat_plugin *ph; /* plugin handle */
 
-#define statusbar_items_redraw(name) ;
-#define get_irssi_dir() hexchat_get_info (ph, "configdir")
-
 void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...);
 
 #define otr_noticest(formatnum, ...) \

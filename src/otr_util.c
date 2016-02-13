@@ -604,8 +604,6 @@ void otr_auth (IRC_CTX *ircctx, char *nick, const char *peername, const char *qu
 	otr_notice (ircctx, nick,
 				coi->received_smp_init ? TXT_AUTH_RESPONDING : TXT_AUTH_INITIATED);
 
-	statusbar_items_redraw ("otr");
-
 	if (peername)
 		*pserver = '@';
 }

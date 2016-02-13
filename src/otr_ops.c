@@ -192,15 +192,6 @@ static void ops_create_instag (void *opdata, const char *accountname, const char
 }
 
 /*
- * A context changed. 
- * I believe this is not happening for the SMP expects.
- */
-static void ops_up_ctx_list (void *opdata)
-{
-	statusbar_items_redraw ("otr");
-}
-
-/*
  * Save fingerprint changes.
  */
 static void ops_writefps (void *data)
@@ -289,7 +280,6 @@ void otr_initops ()
 	otr_ops.gone_insecure = ops_insecure;
 	otr_ops.still_secure = ops_still_secure;
 	otr_ops.max_message_size = ops_max_msg;
-	otr_ops.update_context_list = ops_up_ctx_list;
 	otr_ops.write_fingerprints = ops_writefps;
 	otr_ops.is_logged_in = ops_is_logged_in;
 }
