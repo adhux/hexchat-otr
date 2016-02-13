@@ -82,7 +82,7 @@ void otrlib_deinit ()
 /*
  * Free our app data.
  */
-void context_free_app_info (void *data)
+static void context_free_app_info (void *data)
 {
 	struct co_info *coi = data;
 	if (coi->msgqueue)
@@ -97,7 +97,7 @@ void context_free_app_info (void *data)
  * Add app data to context.
  * See struct co_info for details.
  */
-void context_add_app_info (void *data, ConnContext *co)
+static void context_add_app_info (void *data, ConnContext *co)
 {
 	IRC_CTX *ircctx = IRCCTX_DUP (data);
 	struct co_info *coi = g_malloc (sizeof(struct co_info));

@@ -37,12 +37,27 @@ else
 fi
 AC_SUBST([hexchatlibdir])
 
-CFLAGS="$CFLAGS"
-# TODO: Improve
-if test "$CC" = "gcc" || test "$CC" = "clang"; then
-	CFLAGS="$CFLAGS -Wall -Wextra -Wno-unused-parameter"
-fi
-AC_SUBST([CFLAGS])
+AX_APPEND_COMPILE_FLAGS([ \
+	-std=gnu99 \
+	-funsigned-char \
+	-fstack-protector-strong \
+	-fPIE \
+	-fPIC \
+	-Wall \
+	-Wextra \
+	-Wconversion \
+	-Winline \
+	-Wno-padded \
+	-Wno-unused-parameter \
+	-Wstrict-prototypes \
+	-Wmissing-prototypes \
+	-Werror=implicit-function-declaration \
+	-Werror=pointer-arith \
+	-Werror=init-self \
+	-Werror=format=2 \
+	-Werror=missing-include-dirs \
+	-Werror=date-time \
+])
 
 AC_CONFIG_FILES([
     Makefile

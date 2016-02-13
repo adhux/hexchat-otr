@@ -28,7 +28,7 @@ OtrlPolicy IO_DEFAULT_OTR_POLICY = OTRL_POLICY_MANUAL | OTRL_POLICY_WHITESPACE_S
 /*
  * Return policy for given context based on the otr_policy /setting
  */
-OtrlPolicy ops_policy (void *opdata, ConnContext *context)
+static OtrlPolicy ops_policy (void *opdata, ConnContext *context)
 {
 	struct co_info *coi = context->app_data;
 	char *server = strchr (context->accountname, '@') + 1;
@@ -80,7 +80,7 @@ OtrlPolicy ops_policy (void *opdata, ConnContext *context)
  * Since this can take more than an hour on some systems there isn't even
  * a point in trying...
  */
-void ops_create_privkey (void *opdata, const char *accountname,
+static void ops_create_privkey (void *opdata, const char *accountname,
 						 const char *protocol)
 {
 	keygen_run (accountname);
@@ -91,7 +91,7 @@ void ops_create_privkey (void *opdata, const char *accountname,
  * Deriving the server is currently a hack,
  * need to derive the server from accountname.
  */
-void ops_inject_msg (void *opdata, const char *accountname,
+static void ops_inject_msg (void *opdata, const char *accountname,
 					 const char *protocol, const char *recipient, const char *message)
 {
 	IRC_CTX *a_serv;
@@ -113,23 +113,8 @@ void ops_inject_msg (void *opdata, const char *accountname,
 	g_free (msgcopy);
 }
 
-/* This is kind of messy. */
-const char *convert_otr_msg (const char *msg)
-{
-	GRegex *regex_bold = g_regex_new ("</?i([ /][^>]*)?>", 0, 0, NULL);
-	GRegex *regex_del = g_regex_new ("</?b([ /][^>]*)?>", 0, 0, NULL);
-	gchar *msgnohtml = g_regex_replace_literal (regex_del, msg, -1, 0, "", 0, NULL);
 
-	msg = g_regex_replace_literal (regex_bold, msgnohtml, -1, 0, "*", 0, NULL);
-
-	g_free (msgnohtml);
-	g_regex_unref (regex_del);
-	g_regex_unref (regex_bold);
-
-	return msg;
-}
-
-void ops_handle_msg_event(void *opdata, OtrlMessageEvent msg_event,
+static void ops_handle_msg_event(void *opdata, OtrlMessageEvent msg_event,
 			  ConnContext *context, const char *message,
 			  gcry_error_t err)
 {
@@ -140,10 +125,10 @@ void ops_handle_msg_event(void *opdata, OtrlMessageEvent msg_event,
 		  TXT_OPS_HANDLE_MSG, otr_msg_event_txt[msg_event], message);
 }
 
-/* 
+/*
  * Gone secure.
  */
-void ops_secure (void *opdata, ConnContext *context)
+static void ops_secure (void *opdata, ConnContext *context)
 {
 	struct co_info *coi = context->app_data;
 	char *trust = context->active_fingerprint->trust ?: "";
@@ -172,7 +157,7 @@ void ops_secure (void *opdata, ConnContext *context)
 /*
  * Gone insecure.
  */
-void ops_insecure (void *opdata, ConnContext *context)
+static void ops_insecure (void *opdata, ConnContext *context)
 {
 	struct co_info *coi = context->app_data;
 	otr_notice (coi->ircctx,
@@ -182,7 +167,7 @@ void ops_insecure (void *opdata, ConnContext *context)
 /*
  * Still secure? Need to find out what that means...
  */
-void ops_still_secure (void *opdata, ConnContext *context, int is_reply)
+static void ops_still_secure (void *opdata, ConnContext *context, int is_reply)
 {
 	struct co_info *coi = context->app_data;
 	otr_notice (coi->ircctx,
@@ -194,23 +179,23 @@ void ops_still_secure (void *opdata, ConnContext *context, int is_reply)
  * Unfortunately, we can't tell our peer which size to use.
  * (reminds me of MTU determination...)
  */
-int ops_max_msg (void *opdata, ConnContext *context)
+static int ops_max_msg (void *opdata, ConnContext *context)
 {
 	return OTR_MAX_MSG_SIZE;
 }
 
-void ops_create_instag (void *opdata, const char *accountname, const char *protocol)
+static void ops_create_instag (void *opdata, const char *accountname, const char *protocol)
 {
 	otrl_instag_generate(otr_state, "/dev/null",
 			     		accountname, protocol);
-	otr_writeinstags(otr_state);
+	otr_writeinstags();
 }
 
 /*
  * A context changed. 
  * I believe this is not happening for the SMP expects.
  */
-void ops_up_ctx_list (void *opdata)
+static void ops_up_ctx_list (void *opdata)
 {
 	statusbar_items_redraw ("otr");
 }
@@ -218,12 +203,12 @@ void ops_up_ctx_list (void *opdata)
 /*
  * Save fingerprint changes.
  */
-void ops_writefps (void *data)
+static void ops_writefps (void *data)
 {
 	otr_writefps ();
 }
 
-int ops_is_logged_in (void *opdata, const char *accountname,
+static int ops_is_logged_in (void *opdata, const char *accountname,
 					  const char *protocol, const char *recipient)
 {
 	/*TODO register a handler for event 401 no such nick and set
@@ -237,7 +222,7 @@ void otr_status_change (IRC_CTX *ircctx, const char *nick, int event)
 	/* TODO: ? */
 }
 
-void ops_smp_event(void *opdata, OtrlSMPEvent smp_event,
+static void ops_smp_event(void *opdata, OtrlSMPEvent smp_event,
 		   ConnContext *context, unsigned short progress_percent,
 		   char *question)
 {

@@ -1,22 +1,20 @@
 #include "otr.h"
 
 int debug = 0;
-
-GRegex *regex_nickignore = NULL;
 hexchat_plugin *ph;
+static GRegex *regex_nickignore = NULL;
 
 static char set_policy[512] = IO_DEFAULT_POLICY;
 static char set_policy_known[512] = IO_DEFAULT_POLICY_KNOWN;
 static char set_ignore[512] = IO_DEFAULT_IGNORE;
 static int set_finishonunload = TRUE;
 
-static int
-get_current_context_type (void)
+static int get_current_context_type (void)
 {
 	return hexchat_list_int (ph, NULL, "type");
 }
 
-int extract_nick (char *nick, char *line, size_t nick_size)
+static int extract_nick (char *nick, char *line, size_t nick_size)
 {
 	char *excl;
 
@@ -47,7 +45,7 @@ static void cmd_start (const char *nick)
 	hexchat_commandf (ph, "quote PRIVMSG %s :?OTRv23?", nick);
 }
 
-int cmd_otr (char *word[], char *word_eol[], void *userdata)
+static int cmd_otr (char *word[], char *word_eol[], void *userdata)
 {
 	const char *own_nick = hexchat_get_info (ph, "nick");
 	char *target = (char *)hexchat_get_info (ph, "channel");
@@ -172,7 +170,7 @@ int cmd_otr (char *word[], char *word_eol[], void *userdata)
 	return HEXCHAT_EAT_ALL;
 }
 
-int hook_outgoing (char *word[], char *word_eol[], void *userdata)
+static int hook_outgoing (char *word[], char *word_eol[], void *userdata)
 {
 	const char *own_nick = hexchat_get_info (ph, "nick");
 	const char *channel = hexchat_get_info (ph, "channel");
@@ -207,7 +205,7 @@ int hook_outgoing (char *word[], char *word_eol[], void *userdata)
 	return HEXCHAT_EAT_ALL;
 }
 
-int hook_privmsg (char *word[], char *word_eol[], void *userdata)
+static int hook_privmsg (char *word[], char *word_eol[], void *userdata)
 {
 	char nick[256];
 	char *newmsg;
@@ -312,7 +310,7 @@ int hexchat_plugin_init (hexchat_plugin *plugin_handle,
 	return 1;
 }
 
-int hexchat_plugin_deinit ()
+int hexchat_plugin_deinit (void)
 {
 	g_regex_unref (regex_nickignore);
 

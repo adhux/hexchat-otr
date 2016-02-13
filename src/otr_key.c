@@ -45,7 +45,7 @@ struct
 	pid_t pid;
 } kg_st = { .status = KEYGEN_NO };
 
-void keygen_childwatch (GPid pid, gint status, gpointer data)
+static void keygen_childwatch (GPid pid, gint status, gpointer data)
 {
 	struct pollfd pfd = {
 		.fd = g_io_channel_unix_get_fd (kg_st.ch[0]),
@@ -83,7 +83,7 @@ void keygen_childwatch (GPid pid, gint status, gpointer data)
  * Installed as g_io_watch and called when the key generation
  * process finishs.
  */
-gboolean keygen_complete (GIOChannel *source, GIOCondition condition,
+static gboolean keygen_complete (GIOChannel *source, GIOCondition condition,
 						  gpointer data)
 {
 	gcry_error_t err;

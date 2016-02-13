@@ -206,9 +206,9 @@ void otr_status_change (IRC_CTX *ircctx, const char *nick, int event);
 
 /* init stuff */
 
-int otrlib_init ();
-void otrlib_deinit ();
-void otr_initops ();
+int otrlib_init (void);
+void otrlib_deinit (void);
+void otr_initops (void);
 void otr_setpolicies (const char *policies, int known);
 
 /* basic send/receive/status stuff */
@@ -225,17 +225,17 @@ void otr_finish (IRC_CTX *server, char *nick, const char *peername, int inquery)
 void otr_auth (IRC_CTX *server, char *nick, const char *peername, const char *question, const char *secret);
 void otr_authabort (IRC_CTX *server, char *nick, const char *peername);
 void otr_abort_auth(ConnContext *co, IRC_CTX *ircctx, const char *nick);
-struct ctxlist_ *otr_contexts ();
-void otr_finishall ();
+struct ctxlist_ *otr_contexts (void);
+void otr_finishall (void);
 
 /* key/fingerprint stuff */
 
 void keygen_run (const char *accname);
-void keygen_abort ();
-void key_load ();
-void fps_load ();
-void otr_writefps ();
+void keygen_abort (int ignoreidle);
+void key_load (void);
+void fps_load (void);
+void otr_writefps (void);
 
 /* instance tags */
-void instag_load ();
-void otr_writeinstags ();
+void instag_load (void);
+void otr_writeinstags (void);
