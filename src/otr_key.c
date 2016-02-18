@@ -131,7 +131,7 @@ static gboolean keygen_complete (GIOChannel *source, GIOCondition condition,
 }
 
 /*
- * Run key generation in a seperate process (takes ages).
+ * Run key generation in a separate process (takes ages).
  * The other process will rewrite the key file, we shouldn't 
  * change anything till it's done and we've reloaded the keys.
  */

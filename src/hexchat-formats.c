@@ -9,7 +9,7 @@ FORMAT_REC formats[] = {
 	{ "kg_mkdir", "created directory %s" },
 	{ "kg_pipe", "Key generation for %s: error creating pipe: %s" },
 	{ "kg_fork", "Key generation for %s: fork() error: %s" },
-	{ "kg_initiated", "Key generation for %s: initiated. This might take several minutes or on some systems even an hour. If you wanna check that something is happening, see if there are two processes of your IRC client." },
+	{ "kg_initiated", "Key generation for %s: initiated. This might take several minutes or on some systems even an hour. If you want to check that something is happening, see if there are two processes of your IRC client." },
 	{ "kg_exited", "Key generation for %s: child terminated for unknown reason" },
 	{ "kg_exitsig", "Key generation for %s: child was killed by signal %s" },
 	{ "kg_pollerr", "Key generation for %s: error poll()ing child: %s" },
