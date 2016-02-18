@@ -17,7 +17,7 @@ noinst_HEADERS = \
 	src/otr-formats.h \
 	src/hexchat_otr.h
 
-src/otr-formats.h src/hexchat-formats.c: src/formats.txt
+src/otr-formats.h src/hexchat-formats.c: src/formats.txt src/makeformats.py
 	$(AM_V_GEN) python src/makeformats.py $< src
 
 BUILT_SOURCES = src/otr-formats.h src/hexchat-formats.c
