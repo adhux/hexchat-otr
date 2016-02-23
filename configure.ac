@@ -13,6 +13,9 @@ AM_INIT_AUTOMAKE([1.11 silent-rules tar-pax dist-xz no-dist-gzip subdir-objects 
 AM_SILENT_RULES([yes])
 AM_PROG_AR
 
+AC_DEFUN([HOTR_CHECK_MACRO], [m4_ifndef([$1], [m4_fatal([macro ]$1[ is not defined. Is ]$2[ installed?])])])
+HOTR_CHECK_MACRO([AX_APPEND_COMPILE_FLAGS], [autoconf-archive])
+
 LT_PREREQ([2.2.0])
 LT_INIT
 
