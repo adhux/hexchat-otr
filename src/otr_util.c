@@ -107,8 +107,11 @@ static void context_add_app_info (void *data, ConnContext *co)
 	co->app_data_free = context_free_app_info;
 
 	coi->ircctx = ircctx;
+
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 	g_snprintf (coi->better_msg_two, sizeof(coi->better_msg_two),
 				formats[TXT_OTR_BETTER_TWO].def, co->accountname);
+#pragma GCC diagnostic pop
 }
 
 /*
