@@ -64,10 +64,10 @@ static int cmd_otr (char *word[], char *word_eol[], void *userdata)
 {
 	const char *own_nick = hexchat_get_info (ph, "nick");
 	char *target = (char *)hexchat_get_info (ph, "channel");
-	const char *server = hexchat_get_info (ph, "server");
+	const char *network = hexchat_get_info (ph, "network");
 	IRC_CTX ircctxs = {
 				.nick = (char *)own_nick,
-				.address = (char *)server
+				.address = (char *)network
 			},
 			*ircctx = &ircctxs;
 
@@ -189,12 +189,12 @@ static int hook_outgoing (char *word[], char *word_eol[], void *userdata)
 {
 	const char *own_nick = hexchat_get_info (ph, "nick");
 	const char *channel = hexchat_get_info (ph, "channel");
-	const char *server = hexchat_get_info (ph, "server");
+	const char *network = hexchat_get_info (ph, "network");
 	char newmsg[512];
 	char *otrmsg;
 	IRC_CTX ircctx = {
 		.nick = (char *)own_nick,
-		.address = (char *)server
+		.address = (char *)network
 	};
 
 	if (get_current_context_type () != 3) /* Not PM */
@@ -224,12 +224,12 @@ static int hook_privmsg (char *word[], char *word_eol[], void *userdata)
 {
 	char nick[256];
 	char *newmsg;
-	const char *server = hexchat_get_info (ph, "server");
+	const char *network = hexchat_get_info (ph, "network");
 	const char *own_nick = hexchat_get_info (ph, "nick");
 	const char *chantypes = hexchat_list_str (ph, NULL, "chantypes");
 	IRC_CTX ircctx = {
 		.nick = (char *)own_nick,
-		.address = (char *)server
+		.address = (char *)network
 	};
 	hexchat_context *query_ctx;
 
@@ -254,11 +254,11 @@ static int hook_privmsg (char *word[], char *word_eol[], void *userdata)
 		return HEXCHAT_EAT_NONE;
 	}
 
-	query_ctx = hexchat_find_context (ph, server, nick);
+	query_ctx = hexchat_find_context (ph, network, nick);
 	if (query_ctx == NULL)
 	{
 		hexchat_commandf (ph, "query %s", nick);
-		query_ctx = hexchat_find_context (ph, server, nick);
+		query_ctx = hexchat_find_context (ph, network, nick);
 	}
 
 	GRegex *regex_quot = g_regex_new ("&quot;", 0, 0, NULL);
@@ -348,19 +348,19 @@ void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)
 	va_start (params, fnum);
 	char msg[LOGMAX], *s = msg;
 	hexchat_context *find_query_ctx;
-	char *server = NULL;
+	char *network = NULL;
 
 	if (ircctx)
-		server = ircctx->address;
+		network = ircctx->address;
 
-	if (server && nick)
+	if (network && nick)
 	{
-		find_query_ctx = hexchat_find_context (ph, server, nick);
+		find_query_ctx = hexchat_find_context (ph, network, nick);
 		if (find_query_ctx == NULL)
 		{
 			/* no query window yet, let's open one */
 			hexchat_commandf (ph, "query %s", nick);
-			find_query_ctx = hexchat_find_context (ph, server, nick);
+			find_query_ctx = hexchat_find_context (ph, network, nick);
 		}
 	}
 	else
@@ -369,7 +369,7 @@ void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)
 											   NULL,
 											   hexchat_get_info (ph,
 																 "network")
-												   ?: hexchat_get_info (ph, "server"));
+												   ?: hexchat_get_info (ph, "network"));
 	}
 
 	hexchat_set_context (ph, find_query_ctx);
