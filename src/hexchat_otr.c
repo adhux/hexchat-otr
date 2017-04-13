@@ -376,8 +376,8 @@ void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...)
 
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 	if (g_vsnprintf (msg, sizeof(msg), formats[fnum].def, params) < 0)
-#pragma GCC diagnostic pop
 		g_snprintf (msg, sizeof(msg), "internal error parsing error string (BUG)");
+#pragma GCC diagnostic pop
 	va_end (params);
 	hexchat_printf (ph, "OTR: %s", s);
 }
