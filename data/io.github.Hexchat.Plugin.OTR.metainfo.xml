@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="addon">
+  <id>io.github.Hexchat.Plugin.OTR</id>
+  <extends>io.github.Hexchat.desktop</extends>
+  <name>OTR Plugin</name>
+  <summary>Adds support for Off-the-Record Messaging</summary>
+  <url type="homepage">https://github.com/TingPing/hexchat-otr</url>
+  <project_license>GPL-2.0+</project_license>
+  <metadata_license>CC0-1.0</metadata_license>
+  <update_contact>tingping_AT_fedoraproject.org</update_contact>
+</component>

@@ -74,4 +74,5 @@ else
 endif
 message('Install location: ' + hexchatplugindir)
 
+subdir('data')
 subdir('src')
