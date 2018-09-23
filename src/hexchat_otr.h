@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include <hexchat-plugin.h>
+#include <gmodule.h>
 
 #define MODULE_NAME "otr"
 
@@ -59,13 +60,13 @@ enum
 
 extern hexchat_plugin *ph; /* plugin handle */
 
-int hexchat_plugin_deinit (void);
-int hexchat_plugin_init (hexchat_plugin *plugin_handle,
-                         char **plugin_name,
-                         char **plugin_desc,
-                         char **plugin_version,
-                         char *arg);
-void hexchat_plugin_get_info (char **name, char **desc, char **version, void **reserved);
+G_MODULE_EXPORT int hexchat_plugin_deinit (void);
+G_MODULE_EXPORT int hexchat_plugin_init (hexchat_plugin *plugin_handle,
+                                         char **plugin_name,
+                                         char **plugin_desc,
+                                         char **plugin_version,
+                                         char *arg);
+G_MODULE_EXPORT void hexchat_plugin_get_info (char **name, char **desc, char **version, void **reserved);
 void printformat (IRC_CTX *ircctx, const char *nick, int lvl, int fnum, ...);
 
 #define otr_noticest(formatnum, ...) \

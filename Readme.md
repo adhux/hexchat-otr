@@ -14,11 +14,21 @@ Installation
 - gcrypt
 - libotr4
 - hexchat
+- meson
+
+#### User install
 
 ```sh
-./autogen.sh
-make -s
-sudo make install
+meson builddir -Dlocal_install=true
+ninja -C builddir install
+```
+
+#### System install
+
+```sh
+meson builddir
+ninja -C builddir
+sudo ninja -C builddir install
 ```
 
 Usage

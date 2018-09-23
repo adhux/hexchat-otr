@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # Uli Meis <a.sporto+bee@gmail.com>
 #
@@ -48,7 +48,7 @@ srcx = open(os.path.join(out_dir, "hexchat-formats.c"), "w")
 srcx.write(GPL_LICENSE)
 hdr.write(GPL_LICENSE)
 
-srcx.write('#include "otr.h"\n');
+srcx.write('#include "otr.h"\n')
 srcx.write('FORMAT_REC formats[] = {\n\t')
 srcx.write('{ MODULE_NAME, "otr" }')
 
