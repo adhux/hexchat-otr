@@ -1,7 +1,7 @@
 HexChat OTR
 ===========
 
-Adds off the record support to HexChat.
+Adds off-the-record (OTR) support to HexChat.
 
 Originally forked from irssi-otr and still a work in progress.
 
@@ -45,7 +45,7 @@ Usage
 
 2. Authenticate this user:
 
-	At this point you need to verify this is the person you think.
+	At this point you need to verify this is the person you think it is.
 
 	- If you know their fingerprint and it is correct:
 
@@ -53,10 +53,10 @@ Usage
 		/otr trust
 		```
 
-	- If you have previously agreed on a password:
+	- If you have previously agreed on a shared secret:
 
 		```
-		/otr auth <password>
+		/otr auth <shared secret>
 		```
 
 	- If you have neither of these:

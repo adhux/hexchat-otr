@@ -1,20 +1,20 @@
 Keys
 kg_failed	Key generation for %s: failed: %s (%s)
-kg_completed	Key generation for %s: completed in %d seconds. Reloading keys
-kg_aborted_dup	Key generation for %s: aborted. Key generation for %s still in progress
-kg_aborted_dir	Key generation for %s: aborted, failed creating directory %s: %s
-kg_mkdir	created directory %s
+kg_completed	Key generation for %s: completed in %d seconds. Reloading keys...
+kg_aborted_dup	Key generation for %s: aborted. Key generation for %s still in progress.
+kg_aborted_dir	Key generation for %s: aborted, failed to create directory %s: %s
+kg_mkdir	Created directory %s
 kg_pipe	Key generation for %s: error creating pipe: %s
 kg_fork	Key generation for %s: fork() error: %s
-kg_initiated	Key generation for %s: initiated. This might take several minutes or on some systems even an hour. If you want to check that something is happening, see if there are two processes of your IRC client.
+kg_initiated	Key generation for %s: initiated. This might take several minutes or, on some systems, even an hour. If you want to check that something is happening, see if there are two processes of your IRC client.
 kg_exited	Key generation for %s: child terminated for unknown reason
 kg_exitsig	Key generation for %s: child was killed by signal %s
 kg_pollerr	Key generation for %s: error poll()ing child: %s
 kg_abort	Key generation for %s: aborted
 kg_needacc	I need an account name. Try something like /otr genkey mynick@irc.server.net
 kg_noabort	No ongoing key generation to abort
-key_not_found	no private keys found
-key_loaded	private keys loaded
+key_not_found	No private keys found
+key_loaded	Private keys loaded
 key_load_error	Error loading private keys: %s (%s)
 Fingerprints
 fp_saved	fingerprints saved
@@ -35,7 +35,7 @@ ops_notify	title: %s prim: %s sec: %s
 ops_display_bug	BUG() in ops_display
 ops_display	msg: %s
 ops_sec	gone %%9secure%%9
-ops_fpcomp	Your peer is not authenticated. To make sure you're talking to the right guy you can either agree on a secret and use the authentication described in %9/otr auth%9, or use the traditional way and compare fingerprints over a secure line (e.g. telephone) and subsequently enter %9/otr trust%9.  Your fingerprint is: %s. %s's fingerprint: %s
+ops_fpcomp	Your peer is not authenticated. To be sure you're talking to the correct person you may have agreed on a pre-shared secret, and you may use the authentication described in %9/otr auth%9. Otherwise you should compare fingerprints in-person or over a secure line (e.g. encrypted messenger) and, subsequently, enter %9/otr trust%9 when you have confirmed their identity. Your fingerprint is: %s. %s's fingerprint: %s
 ops_insec	gone %9insecure%9
 ops_still_reply	still %%9secure%9 (is reply)
 ops_still_no_reply	still %%9secure%9 (is not reply)
@@ -44,7 +44,7 @@ ops_inject	Couldn't inject message from %s for %s: %s
 ops_handle_msg	Message event %s, msg %s
 SendingReceiving
 send_failed	send failed: msg=%s
-send_change	couldn't find context also OTR changed the outgoing message(BUG?)
+send_change	couldn't find context, also OTR changed the outgoing message(BUG?)
 send_fragment	failed to fragment message: msg=%s
 send_converted	OTR converted sent message to %s
 receive_ignore_query	ignoring rest of OTR default query msg
@@ -52,17 +52,17 @@ receive_dequeued	dequeued msg of length %d
 receive_queued	queued msg of length %d
 receive_ignore	ignoring protocol message of length %d, acc=%s, from=%s: %s
 receive_converted	OTR converted received message
-otr_better_two	<b>%s</b> has requested an <a href=\"http://otr.cypherpunks.ca/\">Off-the-Record private conversation</a>.  However, you do not have a plugin to support that.
+otr_better_two	<b>%s</b> has requested an <a href=\"http://otr.cypherpunks.ca/\">Off-the-Record private conversation</a>. However, you do not have a plugin to support that.
 otr_better_three	See <a href=\"http://otr.cypherpunks.ca/\">http://otr.cypherpunks.ca/</a> for more information.
 Context
 ctx_not_found	couldn't find context: acc=%s nick=%s
 ctx_not_create	couldn't create/find context: acc=%s from=%s
 Authentication
-auth_aborted_ongoing	Ongoing authentication aborted
-auth_aborted	Authentication aborted
+auth_aborted_ongoing	Ongoing authentication aborted.
+auth_aborted	Authentication aborted.
 auth_responding	Responding to authentication request...
 auth_initiated	Initiated authentication...
-auth_have_old	%s wanted to authenticate but an old authentication was still ongoing.  Old authentication will be aborted, please try again.
+auth_have_old	%s wanted to authenticate, but an old authentication was still ongoing.  Old authentication will be aborted, please try again.
 auth_peer	%s wants to authenticate. Type /otr auth <your-shared-secret> to complete.
 auth_peer_qa	%s wants to authenticate and asked you \"%s\". Type /otr auth <answer> to complete.
 auth_peer_reply_wrong	%s replied to an auth we didn't start.
@@ -75,7 +75,7 @@ auth_needenc	You need to establish an OTR session before you can authenticate.
 Commands
 cmd_otr	We're alive
 cmd_qnotfound	Failed: Can't get nick and server of current query window. (Or maybe you're doing this in the status window?)
-cmd_auth	Please agree on a secret with your peer and then initiate the authentication with /otr auth <secret> or let him initiate. Should you initiate your peer will after a little while be instructed to enter the secret as well. Once he has done so the authentication will finish up. Should you have both typed in the same secret the authentication should be successful.
+cmd_auth	First, agree privately on a pre-shared secret with your peer, and then initiate authentication with /otr auth <secret> (or let them initiate). Should you initiate, your peer will be instructed to enter the shared secret as well. Once they have done so the authentication will finish up. If you have both typed in the same secret the authentication should be successful.
 cmd_debug_on	Debug mode is on
 cmd_debug_off	Debug mode is off
 cmd_finish	Finished conversation with %s@%s.
