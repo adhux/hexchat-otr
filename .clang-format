@@ -1,0 +1,6 @@
+BasedOnStyle: Webkit
+BreakBeforeBraces: Allman
+UseTab: Always
+TabWidth: 4
+SpaceBeforeParens: Always
+PointerAlignment: Right

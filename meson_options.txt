@@ -1,0 +1,3 @@
+option('local_install', type: 'boolean',
+  description: 'Install the plugin into your home directory'
+)
