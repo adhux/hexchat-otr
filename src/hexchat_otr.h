@@ -1,3 +1,5 @@
+#ifndef HEX_OTR_H
+#define HEX_OTR_H
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,3 +92,5 @@ void printformat (IRC_CTX *ircctx, const char *nick, MessageLevel lvl, int fnum,
 #define IRCCTX_ADDR(ircctx) ircctx->address
 #define IRCCTX_NICK(ircctx) ircctx->nick
 #define IRCCTX_FREE(ircctx) g_free (ircctx)
+
+#endif //EOF

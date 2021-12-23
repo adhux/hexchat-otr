@@ -1,5 +1,8 @@
-/*
- * Off-the-Record Messaging (OTR) module for the irssi IRC client
+#ifndef OTR_H
+#define OTR_H
+/* 
+ * Off-the-Record Messaging (OTR) module for IRC clients
+ *  *************************************************** 
  * Copyright (C) 2008  Uli Meis <a.sporto+bee@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -54,14 +57,12 @@ void otr_log (IRC_CTX *server, const char *to,
 /* own */
 
 #include "config.h"
-
 #include "otr-formats.h"
 
-/* 
- * maybe this should be configurable?
- * I believe bitlbee has something >500.
- */
-#define OTR_MAX_MSG_SIZE 400
+/* Most IRC servers limit messages to 512 bytes in length, 
+ * including trailing whitespace and the CR-LF terminating characters 
+ * i.e  len( bytes(msg) | <0x20> x ... | <0x0D0A> ) <= 512 bytes */
+#define OTR_MAX_MSG_SIZE 510 //RFC 2812
 
 /* otr protocol id */
 #define PROTOCOLID "IRC"
@@ -151,12 +152,12 @@ struct co_info
 {
 	char *msgqueue; /* holds partially reconstructed base64
 					   messages */
-	IRC_CTX *ircctx; /* irssi server object for this peer */
+	IRC_CTX *ircctx; /* IRC server object for this peer */
 	int received_smp_init; /* received SMP init msg */
 	int smp_failed; /* last SMP failed */
 	char better_msg_two[256]; /* what the second line of the "better"
-					   default query msg should like. Eat it
-					   up when it comes in */
+				     default query msg should like. Eat 
+				     it up when it comes in */
 	int finished; /* true after you've /otr finished */
 };
 
@@ -190,7 +191,6 @@ struct ctxlist_
 };
 
 /* policy list generated from /set otr_policy */
-
 struct plistentry
 {
 	GPatternSpec *namepat;
@@ -205,21 +205,18 @@ IRC_CTX *server_find_address (char *address);
 void otr_status_change (IRC_CTX *ircctx, const char *nick, int event);
 
 /* init stuff */
-
 int otrlib_init (void);
 void otrlib_deinit (void);
 void otr_initops (void);
 void otr_setpolicies (const char *policies, int known);
 
 /* basic send/receive/status stuff */
-
 char *otr_send (IRC_CTX *server, const char *msg, const char *to);
 char *otr_receive (IRC_CTX *server, const char *msg, const char *from);
 int otr_getstatus(IRC_CTX *ircctx, const char *nick);
 ConnContext *otr_getcontext (const char *accname, const char *nick, int create, void *data);
 
 /* user interaction */
-
 void otr_trust (IRC_CTX *server, char *nick, const char *peername);
 void otr_finish (IRC_CTX *server, char *nick, const char *peername, int inquery);
 void otr_auth (IRC_CTX *server, char *nick, const char *peername, const char *question, const char *secret);
@@ -229,7 +226,6 @@ struct ctxlist_ *otr_contexts (void);
 void otr_finishall (void);
 
 /* key/fingerprint stuff */
-
 void keygen_run (const char *accname);
 void keygen_abort (int ignoreidle);
 void key_load (void);
@@ -239,3 +235,5 @@ void otr_writefps (void);
 /* instance tags */
 void instag_load (void);
 void otr_writeinstags (void);
+
+#endif //EOF

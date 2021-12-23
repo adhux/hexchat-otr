@@ -1,5 +1,6 @@
 /*
- * Off-the-Record Messaging (OTR) module for the irssi IRC client
+ * Off-the-Record Messaging (OTR) module for IRC clients
+ *  *************************************************** 
  * Copyright (C) 2008  Uli Meis <a.sporto+bee@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -143,15 +144,12 @@ static void ops_secure (void *opdata, ConnContext *context)
 	 * Let's print out the fingerprints for comparison */
 
 	otrl_privkey_hash_to_human (peerfp,
-								context->active_fingerprint->fingerprint);
+				    context->active_fingerprint->fingerprint);
 
 	otr_notice (coi->ircctx, context->username, TXT_OPS_FPCOMP,
-				otrl_privkey_fingerprint (otr_state,
-										  ownfp,
-										  context->accountname,
-										  PROTOCOLID),
-				context->username,
-				peerfp);
+		    otrl_privkey_fingerprint (otr_state, ownfp,
+					      context->accountname, PROTOCOLID),
+		    context->username, peerfp);
 }
 
 /*
@@ -174,7 +172,7 @@ static void ops_still_secure (void *opdata, ConnContext *context, int is_reply)
 				context->username, is_reply ? TXT_OPS_STILL_REPLY : TXT_OPS_STILL_NO_REPLY);
 }
 
-/*
+/* 
  * Really critical with IRC. 
  * Unfortunately, we can't tell our peer which size to use.
  * (reminds me of MTU determination...)

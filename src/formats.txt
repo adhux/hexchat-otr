@@ -3,9 +3,9 @@ kg_failed	Key generation for %s: failed: %s (%s)
 kg_completed	Key generation for %s: completed in %d seconds. Reloading keys...
 kg_aborted_dup	Key generation for %s: aborted. Key generation for %s still in progress.
 kg_aborted_dir	Key generation for %s: aborted, failed to create directory %s: %s
-kg_mkdir	Created directory %s
-kg_pipe	Key generation for %s: error creating pipe: %s
-kg_fork	Key generation for %s: fork() error: %s
+kg_mkdir	created directory %s
+kg_pipe	        Key generation for %s: error creating pipe: %s
+kg_fork	        Key generation for %s: fork() error: %s
 kg_initiated	Key generation for %s: initiated. This might take several minutes or, on some systems, even an hour. If you want to check that something is happening, see if there are two processes of your IRC client.
 kg_exited	Key generation for %s: child terminated for unknown reason
 kg_exitsig	Key generation for %s: child was killed by signal %s
@@ -34,11 +34,11 @@ ops_notify_bug	BUG() in ops_notify
 ops_notify	title: %s prim: %s sec: %s
 ops_display_bug	BUG() in ops_display
 ops_display	msg: %s
-ops_sec	gone %%9secure%%9
-ops_fpcomp	Your peer is not authenticated. To be sure you're talking to the correct person you may have agreed on a pre-shared secret, and you may use the authentication described in %9/otr auth%9. Otherwise you should compare fingerprints in-person or over a secure line (e.g. encrypted messenger) and, subsequently, enter %9/otr trust%9 when you have confirmed their identity. Your fingerprint is: %s. %s's fingerprint: %s
-ops_insec	gone %9insecure%9
-ops_still_reply	still %%9secure%9 (is reply)
-ops_still_no_reply	still %%9secure%9 (is not reply)
+ops_sec	        Channel has gone %%9secure%%9.
+ops_fpcomp	Your peer is not authenticated. To be sure you're talking to the correct person you may have privately agreed on a shared secret. If so, you may use the authentication described in %9/otr auth%9. Otherwise you should compare fingerprints in-person or over a secure line (e.g. encrypted messenger) and, subsequently, enter %9/otr trust%9 when you have confirmed your peer's identity. Your fingerprint is: %s. %s's fingerprint: %s
+ops_insec	Channel has gone %9insecure%9
+ops_still_reply	        still %%9secure%9 (Peer replied)
+ops_still_no_reply	still %%9secure%9 (Peer did not reply)
 ops_log	log msg: %s
 ops_inject	Couldn't inject message from %s for %s: %s
 ops_handle_msg	Message event %s, msg %s
@@ -73,9 +73,9 @@ auth_successful	Authentication successful!
 auth_failed	Authentication failed!
 auth_needenc	You need to establish an OTR session before you can authenticate.
 Commands
-cmd_otr	We're alive
+cmd_otr	        We're alive
 cmd_qnotfound	Failed: Can't get nick and server of current query window. (Or maybe you're doing this in the status window?)
-cmd_auth	First, agree privately on a pre-shared secret with your peer, and then initiate authentication with /otr auth <secret> (or let them initiate). Should you initiate, your peer will be instructed to enter the shared secret as well. Once they have done so the authentication will finish up. If you have both typed in the same secret the authentication should be successful.
+cmd_auth	First, agree privately on a shared secret with your peer, and then initiate authentication with /otr auth <secret> (or let them initiate). Should you initiate, your peer will be instructed to enter the shared secret as well. Once they have done so the authentication will finish up. If you have both typed in the same secret the authentication should be successful.
 cmd_debug_on	Debug mode is on
 cmd_debug_off	Debug mode is off
 cmd_finish	Finished conversation with %s@%s.
